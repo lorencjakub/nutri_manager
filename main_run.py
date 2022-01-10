@@ -2,7 +2,6 @@ from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 import os
 from distinct_types import *
-from data_miner import crawl_nutri_tables
 
 app = Flask(__name__, static_folder='static', static_url_path='', template_folder='templates')
 app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY", default=str(os.urandom(24)))
@@ -14,12 +13,6 @@ db = SQLAlchemy(app)
 db.session().expire_on_commit = False
 os.environ["FLASK_APP"] = "migrate_db.py"
 
-# REGISTRACE BLUEPRINTŮ
-import nutri_tables
-app.register_blueprint(nutri_tables.nutri_tables)
-
-from models import *
-
 
 @app.route("/")
 def public_table() -> WebTemplate:
@@ -28,8 +21,10 @@ def public_table() -> WebTemplate:
 
 if __name__ == '__main__':
     if "database.sqlite3" not in os.listdir(os.getcwd()):
+        from data_miners.data_miner import crawl_all
+        from models import *
         db.create_all()
         os.system("flask db init")
-        crawl_nutri_tables()
+        crawl_all()
 
     app.run(debug=True)

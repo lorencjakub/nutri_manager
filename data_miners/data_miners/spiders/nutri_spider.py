@@ -22,12 +22,12 @@ class NutriTableSpider(scrapy.Spider):
         if response.xpath("//tbody/tr")[:-1].css(f"td:nth-child(2)::text").get():
             for row in response.xpath("//tbody/tr")[:-1]:
                 food_data = {
-                    "name": row.css(f"td:nth-child(1) div div a::text").get(),
-                    "energy": row.css(f"td:nth-child(2)::text").get(),
-                    "proteins": row.css(f"td:nth-child(3)::text").get(),
-                    "carbs": row.css(f"td:nth-child(4)::text").get(),
-                    "fats": row.css(f"td:nth-child(5)::text").get(),
-                    "fiber": row.css(f"td:nth-child(6)::text").get(),
+                    "name": row.css("td:nth-child(1) div div a::text").get(),
+                    "energy": row.css("td:nth-child(2)::text").get(),
+                    "proteins": row.css("td:nth-child(3)::text").get(),
+                    "carbs": row.css("td:nth-child(4)::text").get(),
+                    "fats": row.css("td:nth-child(5)::text").get(),
+                    "fiber": row.css("td:nth-child(6)::text").get(),
                 }
 
                 self.write_data(food_data)
@@ -46,8 +46,9 @@ class NutriTableSpider(scrapy.Spider):
         n = FoodNutrients().save_nutrients(**data)
 
         try:
-            db.session.add(n)
-            db.session.commit()
+            if len(FoodNutrients.query.filter_by(name=data["name"]).all()) == 0:
+                db.session.add(n)
+                db.session.commit()
 
         except Exception as e:
             print(e)
