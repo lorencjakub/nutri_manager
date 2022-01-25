@@ -7,6 +7,7 @@ class FoodNutrients(db.Model):
     __tablename__ = "food_nutrients"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
+    eng_name = db.Column(db.Text)
     energy = db.Column(db.Text, nullable=False)
     proteins = db.Column(db.Text, nullable=False)
     carbs = db.Column(db.Text, nullable=False)
@@ -17,9 +18,9 @@ class FoodNutrients(db.Model):
         return "<Potravina {name} ID {id}>".format(name=self.name, id=self.id)
 
     def __str__(self):
-        return "<{id} {name} {energy} {proteins} {carbs} {fats} {fiber}>".format(
+        return "<{id} {name} {eng_name} {energy} {proteins} {carbs} {fats} {fiber}>".format(
             id=self.id, name=self.name, energy=self.energy, proteins=self.proteins, carbs=self.carbs, fats=self.fats,
-            fiber=self.fiber)
+            fiber=self.fiber, eng_name=self.eng_name)
 
     @staticmethod
     def save_nutrients(**kwargs):
@@ -32,6 +33,7 @@ class NutriRecipes(db.Model):
     __tablename__ = "nutri_recipes"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
+    eng_ingredients = db.Column(db.Text)
     energy = db.Column(db.Text, nullable=False)
     proteins = db.Column(db.Text, nullable=False)
     carbs = db.Column(db.Text, nullable=False)

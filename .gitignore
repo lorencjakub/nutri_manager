@@ -16,3 +16,4 @@ venv.bak/
 *.sqlite3*
 *.sqlite3-journal
 migrations/
+DB_backups/

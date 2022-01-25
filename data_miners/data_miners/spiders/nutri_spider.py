@@ -1,6 +1,8 @@
 import scrapy
 from scrapy.exceptions import CloseSpider
-import re
+from googletrans import Translator
+from models import FoodNutrients, db
+import time
 
 
 class NutriTableSpider(scrapy.Spider):
@@ -30,49 +32,47 @@ class NutriTableSpider(scrapy.Spider):
                     "fiber": row.css("td:nth-child(6)::text").get(),
                 }
 
-                self.write_data(food_data)
+                if len(FoodNutrients.query.filter_by(name=food_data["name"]).all()) == 0:
+                    self.write_data(food_data)
+
+                else:
+                    print(f'DB already contains food <<{food_data["name"]}>>.')
 
         else:
             raise CloseSpider("Empty table, crawling is done.")
 
     def write_data(self, data: dict) -> None:
+        time.sleep(0.2)
         for key, value in list(data.items())[1:]:
             string_without_whitespaces = value.replace(" ", "").replace(",", ".")
             data[key] = float(string_without_whitespaces) if string_without_whitespaces != "" else 0
 
-        data["name"] = self.edit_name(data["name"])
-
-        from models import FoodNutrients, db
-        n = FoodNutrients().save_nutrients(**data)
+        translator = Translator()
 
         try:
-            if len(FoodNutrients.query.filter_by(name=data["name"]).all()) == 0:
-                db.session.add(n)
-                db.session.commit()
+            translated = translator.translate(data["name"], dest='en')
+            language = translated.src
+            text = translated.text
 
-        except Exception as e:
-            print(e)
-            raise CloseSpider("Problem with adding data to the DB.")
+        except AttributeError:
+            language = "cs"
+            text = "?"
 
-        self.count_one()
+        if language == "cs" and len(data["name"].split(" ")) <= 3:
+            data["eng_name"] = text.lower()
 
-    @staticmethod
-    def edit_name(name: str) -> str:
-        wrong_characters = "ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝßàáâãäåçèéêëìíîïñòóôõöùúûüýÿĀāĂăĄąĆćĈĉĊċČčĎďĐđĒēĔĕĖėĘęĚěĜĝĞğĠġ" \
-                           "ĢģĤĥĦħĨĩĪīĬĭĮįİıĶķĸĹĺĻļĽľĿŀŁłŃńŅņŇňŉŊŋŌōŎŏŐőŔŕŖŗŘřŚśŜŝŞşŠšŢţŤťŦŧŨũŪūŬŭŮůŰűŲųŴŵŶŷŸŹźŻżŽžſ"
-        correct_characters = "AAAAAACEEEEIIIINOOOOOUUUUYsaaaaaaceeeeiiiinooooouuuuyyAaAaAaCcCcCcCcDdDdEeEeEeEeEeGgGgG" \
-                             "gGgHhHhIiIiIiIiIiKkkLlLlLlLlLlNnNnNnNnNOoOoOoRrRrRrSsSsSsSsTtTtTtUuUuUuUuUuUuWwYyYZzZzZzs"
+            n = FoodNutrients().save_nutrients(**data)
 
-        for index, char in enumerate(name):
             try:
-                char_list = list(name)
-                char_list[index] = correct_characters[wrong_characters.index(char)]
-                name = "".join(char_list)
+                if len(FoodNutrients.query.filter_by(name=data["name"]).all()) == 0:
+                    db.session.add(n)
+                    db.session.commit()
 
-            except ValueError:
-                continue
+            except Exception as e:
+                print(e)
+                raise CloseSpider("Problem with adding data to the DB.")
 
-        return re.sub(r'\W+', '', name.lower().replace(" ", "_"))
+            self.count_one()
 
     @classmethod
     def reset_counter(cls):
