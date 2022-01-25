@@ -1,7 +1,20 @@
-from flask import Flask, render_template
-from flask_sqlalchemy import SQLAlchemy
 import os
 from distinct_types import *
+
+try:
+    from flask import Flask, render_template
+
+except ModuleNotFoundError:
+    in_venv = input("I can't find neccessary packages, but I can install them.\n"
+                    "Am I in virtual environment now, where I could do it? (y/n)")
+
+    if in_venv != "y":
+        print("OK, let me create a new one with all wonderfulness!")
+        os.system("py -m venv venv")
+        os.system(r".\venv\Scripts\activate")
+        os.system("pip install -r requirements.txt -y")
+
+from flask_sqlalchemy import SQLAlchemy
 import logging
 
 # logging.getLogger('scrapy').propagate = False
@@ -32,13 +45,12 @@ if __name__ == '__main__':
         os.system("flask db init")
         crawl_all()
 
-    # if db.session.query(func.count(NutriRecipes.id)).scalar() == 0:
-    #     print("NO RECIPES, CRAWLING STARTING...")
-    #     crawl_nutri_recipes()
-    #
-    # if db.session.query(func.count(FoodNutrients.id)).scalar() == 0:
-    #     print("NO NUTRIENTS, CRAWLING STARTING...")
-    #     crawl_nutri_tables()
-    #crawl_all()
+    if db.session.query(func.count(NutriRecipes.id)).scalar() == 0:
+        print("NO RECIPES, CRAWLING STARTING...")
+        crawl_nutri_recipes()
+
+    if db.session.query(func.count(FoodNutrients.id)).scalar() == 0:
+        print("NO NUTRIENTS, CRAWLING STARTING...")
+        crawl_nutri_tables()
 
     app.run(debug=True)
