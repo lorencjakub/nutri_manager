@@ -49,7 +49,7 @@ html, body {
   background-color: var(--bg-body);
 }
 
-.calendar {
+.calendar, .menu-list {
   height: max-content;
   width: max-content;
   background-color: var(--bg-main);

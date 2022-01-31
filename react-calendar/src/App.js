@@ -7,10 +7,20 @@ import { useState } from 'react';
 
 function App() {
   const [menuVisibility, setMenuVisibility] = useState(false);
-  console.log(menuVisibility);
+  const [clickedDate, setClickedDate] = useState(null);
+
+  const handleClick = (switchToMenuList, date) => {
+    if (date) {
+      setClickedDate(date);
+      setMenuVisibility(switchToMenuList);
+    } else {
+      setMenuVisibility(switchToMenuList);
+    }
+  };
+
   return ([
-    <Calendar calendarVisibility={ menuVisibility ? false : true }/>,
-    <MenuList menuVisibility={ menuVisibility }/>
+    <Calendar calendarVisibility={ menuVisibility ? false : true } handleClick={handleClick}/>,
+    <MenuList menuVisibility={ menuVisibility } handleClick={handleClick} clickedDate={clickedDate}/>
   ]);
 }
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import $ from 'jquery';
 
 
-export default function Calendar({ calendarVisibility }) {
+export default function Calendar({ calendarVisibility, handleClick }) {
     const [monthNames] = useState(['Leden', 'Únor', 'Březen', 'Duben', 'Květen',
                                     'Červen', 'Červenec', 'Srpen', 'Září', 'Říjen', 
                                     'Listopad', 'Prosinec']);
@@ -55,7 +55,7 @@ export default function Calendar({ calendarVisibility }) {
                 currDate = true;
             }
 
-            days.push(<Day value={value} currDate={currDate}/>);
+            days.push(<Day value={value} currDate={currDate} clickedDay={handleClick}/>);
         }
 
         return days;
@@ -71,7 +71,7 @@ export default function Calendar({ calendarVisibility }) {
     }, [year, month, dayCounts, dayNames, monthNames]);
     return (
         <div className="calendar" style={ {display: calendarVisibility ? 'block' : 'none'} }>
-            <CalendarHeader />
+            <CalendarHeader/>
             <CalendarBody days={days}/>
             <CalendarFooter />
         </div>
@@ -145,11 +145,11 @@ export default function Calendar({ calendarVisibility }) {
         );
     }
 
-    function Day({ value, currDate }) {
+    function Day({ value, currDate, clickedDay }) {
         const dayClass = (currDate) ? "calendar-day-hover curr-date" : "calendar-day-hover";
 
         return (
-            <div className={dayClass}>
+            <div className={dayClass} onClick={() => clickedDay(true, new Date(`${year}-${monthNames.indexOf(month) + 1}-${value}`))}>
                 {value}
                 <span></span>
                 <span></span>
