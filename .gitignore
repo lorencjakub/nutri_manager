@@ -1,19 +1,19 @@
 # Byte-compiled / optimized / DLL files
-__pycache__/
+API/__pycache__/
 # *.py[cod]
 
 # Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-.vscode
+API/.env
+API/.venv
+API/env/
+API/venv/
+API/ENV/
+API/env.bak/
+API/venv.bak/
+API/.vscode
 
 # Database stuff
-*.sqlite3*
-*.sqlite3-journal
-migrations/
-DB_backups/
+API/*.sqlite3*
+API/*.sqlite3-journal
+API/migrations/
+API/DB_backups/
