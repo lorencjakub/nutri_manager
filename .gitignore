@@ -20,23 +20,7 @@ API/DB_backups/
 
 # NPM STUFF:
 # dependencies
-/react-calendar/nutri-manager-fe/node_modules
-/react-calendar/nutri-manager-fe/pnp
-/react-calendar/nutri-manager-fe/pnp.js
-
-# testing
-/react-calendar/nutri-manager-fe/coverage
+/react-calendar/node_modules
 
 # production
-/react-calendar/nutri-manager-fe/build
-
-# misc
-/react-calendar/nutri-manager-fe/DS_Store
-/react-calendar/nutri-manager-fe/env.local
-/react-calendar/nutri-manager-fe/env.development.local
-/react-calendar/nutri-manager-fe/env.test.local
-/react-calendar/nutri-manager-fe/env.production.local
-
-/react-calendar/nutri-manager-fe/npm-debug.log*
-/react-calendar/nutri-manager-fe/yarn-debug.log*
-/react-calendar/nutri-manager-fe/yarn-error.log*
+/react-calendar/build

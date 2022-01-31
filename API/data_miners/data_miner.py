@@ -42,15 +42,15 @@ def crawl_all() -> None:
     start_time = datetime.datetime.now().timestamp()
     process = CrawlerProcess()
 
-    nutri_tables = input("This function will start crawling of food database of kaloricketabulky.cz (over 200 000 "
-                         "of records).\nThis task can take up to few hours.\nAre you sure to start it? (y/n)").lower()
-
+    # nutri_tables = input("This function will start crawling of food database of kaloricketabulky.cz (over 200 000 "
+    #                      "of records).\nThis task can take up to few hours.\nAre you sure to start it? (y/n)").lower()
+    nutri_tables = "n"
     if nutri_tables == "y":
         process.crawl(NutriTableSpider)
 
-    nutri_recipes = input("This function will start crawling of food database of zdravefitrecepty.cz."
-                          "\nThis task should take up to few minutes.\nAre you sure to start it? (y/n)").lower()
-
+    # nutri_recipes = input("This function will start crawling of food database of zdravefitrecepty.cz."
+    #                       "\nThis task should take up to few minutes.\nAre you sure to start it? (y/n)").lower()
+    nutri_recipes = "y"
     if nutri_recipes == "y":
         process.crawl(NutriRecipeSpider)
 
