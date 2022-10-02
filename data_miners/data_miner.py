@@ -1,72 +1,86 @@
-from data_miners.data_miners.spiders.nutri_spider import NutriTableSpider
-from data_miners.data_miners.spiders.recipe_spider import NutriRecipeSpider
-from data_miners.data_miners.spiders.recipe_url_spider import NutriRecipeUrlSpider
-from scrapy.crawler import CrawlerProcess
+from data_miners.data_miners.spiders.recipe_spider import NutriRecipeSpider, EnNutriRecipeSpider
+from distinct_types import CrawlerSpider
+
+from twisted.internet import reactor, defer
+from scrapy.crawler import CrawlerProcess, CrawlerRunner
+from scrapy.utils.project import get_project_settings
+from scrapy.utils.log import configure_logging
+
 import datetime
-import os
+import sys
 
 
-def crawl_nutri_tables() -> None:
-    start_time = datetime.datetime.now().timestamp()
-    NutriTableSpider().reset_counter()
-
-    process = CrawlerProcess()
-    process.crawl(NutriTableSpider)
-    process.start()
-
-    duration = datetime.datetime.now().timestamp() - start_time
-    minutes = int(duration // 60)
-    seconds = round(duration % 60, 3)
-    print(f"Done. {NutriTableSpider().count} records have been added in {minutes} minutes and {seconds} seconds.")
-
-
-def crawl_nutri_recipes_url() -> None:
-    print("Crawling of urls for zdravefitrecepty.cz is starting.")
-    process = CrawlerProcess()
-    process.crawl(NutriRecipeUrlSpider)
-    process.start()
-
-
-def crawl_nutri_recipes() -> None:
-    print("Crawling of recipes from zdravefitrecepty.cz is starting.")
-    NutriRecipeSpider.reset_counter()
-    start_time = datetime.datetime.now().timestamp()
-
-    process = CrawlerProcess()
-    process.crawl(NutriRecipeSpider)
-    process.start()
-
-    duration = datetime.datetime.now().timestamp() - start_time
-    print(f"Done. {NutriRecipeSpider().count} records have been added in {round(duration, 3)} seconds.")
-
-    if os.path.isfile(os.getcwd() + "/data_miners/urls.txt"):
-        os.remove(os.getcwd() + "/data_miners/urls.txt")
-
-
-def crawl_all() -> None:
-    start_time = datetime.datetime.now().timestamp()
-
+class DataMiners:
+    main_nutri_recipe_spider: CrawlerSpider = NutriRecipeSpider
+    en_nutri_recipe_spider: CrawlerSpider = EnNutriRecipeSpider
+    runner = CrawlerRunner()
     process = CrawlerProcess()
 
-    nutri_tables = input("This function will start crawling of food database of kaloricketabulky.cz (over 200 000 "
-                         "of records).\nThis task can take up to few hours.\nAre you sure to start it? (y/n)")
+    def __init__(self) -> None:
+        self.start_time: float = datetime.datetime.now().timestamp()
+        self.set_runner()
 
-    if nutri_tables == "y":
-        process.crawl(NutriTableSpider)
+    def set_runner(self) -> None:
+        configure_logging()
+        settings = get_project_settings()
+        self.runner = CrawlerRunner(settings)
 
-    nutri_recipes = input("This function will start crawling of food database of zdravefitrecepty.cz."
-                          "\nThis task will take around one minute.\nAre you sure to start it? (y/n)")
+    def start_timer(self) -> None:
+        self.start_time = datetime.datetime.now().timestamp()
 
-    if nutri_recipes == "y":
-        process.crawl(NutriRecipeUrlSpider)
-        process.crawl(NutriRecipeSpider)
+    def intial_db_crawling(self) -> None:
+        print("Recipe DB is empty. The crawling of food database of zdravefitrecepty.cz..."
+              "\nThis task will take around one minute.")
+        self.use_more_spiders()
 
-    if nutri_tables == "y" or nutri_recipes == "y":
-        process.start()
-        duration = datetime.datetime.now().timestamp() - start_time
-        minutes = int(duration // 60)
-        seconds = round(duration % 60, 3)
-        print(f"Done. Crawling tooks {minutes} minutes and {seconds} seconds.")
+    def use_more_spiders(self) -> None:
+        self.start_timer()
+        self.crawl()
+        reactor.run()
 
-    if os.path.isfile(os.getcwd() + "/data_miners/urls.txt"):
-        os.remove(os.getcwd() + "/data_miners/urls.txt")
+        duration = datetime.datetime.now().timestamp() - self.start_time
+        print(f"Done. {self.main_nutri_recipe_spider().count} records added in {round(duration, 3)} seconds.")
+
+    def use_en_spider(self) -> None:
+        if '-U' in sys.argv or '--update' in sys.argv:
+            update = input("Some of recipes does not contain english variant of ingredients."
+                           "\nThis task will take around one minute.\nDo you want try to update?(y/n)")
+        else:
+            update = 'n'
+
+        if update.lower() == 'y':
+            print('Updating...')
+            self.start_timer()
+            self.process.crawl(EnNutriRecipeSpider)
+            self.process.start()
+
+        duration = datetime.datetime.now().timestamp() - self.start_time
+
+        if duration > 100:
+            print(f"Done. {self.en_nutri_recipe_spider().count} records updated in {round(duration, 3)} seconds.")
+
+        else:
+            print('DB check is completed, app is starting...')
+
+    @classmethod
+    @defer.inlineCallbacks
+    def crawl(cls):
+        yield cls.runner.crawl(cls.main_nutri_recipe_spider)
+        yield cls.runner.crawl(cls.en_nutri_recipe_spider)
+
+        reactor.stop()
+
+
+def crawl_nutri_recipes(rows_count: int, rows_with_en_ingredients_count: int) -> None:
+    crawler = DataMiners()
+
+    if rows_with_en_ingredients_count == 0:
+        print("No data in DB. Crawling starts...")
+        crawler.use_more_spiders()
+
+    if rows_count != rows_with_en_ingredients_count:
+        crawler.use_en_spider()
+
+    if '-U' in sys.argv or '--update' in sys.argv:
+        print("Updating data...")
+        crawler.use_more_spiders()

@@ -16,3 +16,8 @@ venv.bak/
 *.sqlite3*
 *.sqlite3-journal
 migrations/
+
+# React
+.parcel-cache
+node_modules
+dist/
