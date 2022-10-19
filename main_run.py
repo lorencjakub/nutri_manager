@@ -1,4 +1,9 @@
 from flask import Flask
+from flask_cors import CORS
+from utils.SecurityManager import SecurityHeaderManager
+
+
+from utils.security_settings import set_cors, set_security_headers
 from extensions import db, migrate
 from api.routes import *
 
@@ -14,6 +19,8 @@ def create_app(env: str = "dev"):
     config_object = "config_dev" if env == "dev" else "config_prod"
 
     app = Flask("nutri_manager")
+    CORS(app, **set_cors())
+    SecurityHeaderManager(app, **set_security_headers())
     app.config.from_object(config_object)
     register_extensions(app)
     register_blueprints(app)
@@ -24,7 +31,7 @@ def create_app(env: str = "dev"):
     return app
 
 
-def register_extensions(app):
+def register_extensions(app: Flask) -> None:
     """Register Flask extensions."""
     db.init_app(app)
     # db.session().expire_on_commit = False
@@ -33,14 +40,15 @@ def register_extensions(app):
     return None
 
 
-def register_blueprints(app):
+def register_blueprints(app: Flask) -> None:
     """Register Flask api."""
     app.register_blueprint(HOME_BLUEPRINT)
     app.register_blueprint(MENU_BLUEPRINT)
+
     return None
 
 
-def main_loop():
+def main_loop() -> None:
     from api.models.models import NutriRecipes
     from sqlalchemy import func
     from data_miners.data_miner import crawl_nutri_recipes

@@ -17,3 +17,7 @@ GeneratedMenuData = NewType("GeneratedMenuData",
                             Dict[str, Union[Dict[str, Dict[str, Union[str, int]]], Dict[str, float]]])
 
 RecipeData = NewType("RecipeData", Dict[str, Union[str, float, int]])
+
+CORSSettings = NewType("CORSSettings", Dict[str, Union[List[str], str]])
+
+SecuritySettings = NewType("SecuritySettings", Dict[str, Union[List[str], str]])

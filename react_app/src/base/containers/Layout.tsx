@@ -1,6 +1,10 @@
-import React, { FC, Suspense } from 'react'
-import { Box, CircularProgress, Grid, Paper } from '@mui/material'
+import React, { FC, Suspense, lazy } from 'react'
+import { CircularProgress, Grid } from '@mui/material'
+import { useRoutes } from 'react-router-dom'
+import routes from '../../app/utils/routes'
 
+
+const NotFoundPage = lazy(() => import("../../app/pages/NotFound"))
 
 export const Layout: FC<{}> = () => {
   return (
@@ -40,7 +44,9 @@ export const Layout: FC<{}> = () => {
                       maxWidth: "calc(100% - 20px)"
                   }}
               >
-                  <h1>CONTENT</h1>
+                <Suspense fallback={<CircularProgress />}>
+                    {useRoutes([...routes]) || <NotFoundPage />}
+                </Suspense>
               </Grid>
           </Suspense>
       </div>
