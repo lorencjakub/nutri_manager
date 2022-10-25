@@ -1,17 +1,16 @@
-from flask import jsonify, Blueprint, json, request, Response
+from flask import jsonify, Blueprint, request, Response
 from api.services import generate_menu, get_recipe
-from distinct_types import Type, Union, Tuple, GeneratedMenuData
 
 
 MENU_BLUEPRINT = Blueprint("menu", __name__)
 
 
 @MENU_BLUEPRINT.route("/menu")
-def get_menu():
+def get_menu() -> Response:
     data = dict(request.args)
     response = generate_menu(**data)
 
-    return jsonify(response) if response else Response("Wrong inputs", 404)
+    return jsonify(response) if response else Response("Wrong inputs", 400)
 
 
 @MENU_BLUEPRINT.route("/menu/<recipe_id>")

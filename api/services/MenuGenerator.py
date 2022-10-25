@@ -1,7 +1,7 @@
 from api.models.models import NutriRecipes
 import random
 from datetime import datetime
-from distinct_types import List, Type, GeneratedMenu, GeneratedMenuData, Tuple
+from distinct_types import List, Type, GeneratedMenu, GeneratedMenuData
 
 
 class Menu:
@@ -36,9 +36,10 @@ class Menu:
         self.__balance_nutrients_ratios()
 
     @classmethod
-    def __validate_parameters(cls, proteins: float = 0, carbs: float = 0, fats: float = 0, energy: float = 2000) -> bool:
+    def __validate_parameters(cls, proteins: float = 0, carbs: float = 0,
+                              fats: float = 0, energy: float = 2000) -> bool:
         for p in [proteins, carbs, fats, energy]:
-            if (isinstance(p, float) or str(p).isdigit()) and p >= 0:
+            if (isinstance(p, float) or str(p).isdigit()) and float(p) >= 0:
                 continue
 
             else:
@@ -66,7 +67,7 @@ class Menu:
             self.proteins_ratio = round((self.proteins_ratio / sum_of_ratios) * 100, 0)
             self.fats_ratio = round((self.fats_ratio / sum_of_ratios) * 100, 0)
 
-    def create_menu(self) -> Tuple[GeneratedMenuData, int]:
+    def create_menu(self) -> GeneratedMenuData:
         """
         This method takes generated menu from generate_menu() method and summarizes energies from foods.
         If the total energy of day is under 80% of the maximum energy or over the maximum energy, the current menu
@@ -137,8 +138,8 @@ class Menu:
                 parameters_fulfilled = True
 
         if not parameters_fulfilled:
-            return "No generated menu does not suit defined nutrient parameters.\n" \
-                   "Please, try it again or change your parameters.", 204
+            return "No generated menu does not suit defined nutrient parameters. " \
+                   "Please, try it again or change your parameters."
 
         return {
             "iterations": generate_count,
@@ -175,7 +176,7 @@ class Menu:
                 "fats": round((day_fats_energy / day_energy) * 100, 0),
                 "fiber": day_fiber_energy
             }
-        }, 200
+        }
 
     @staticmethod
     def generate_menu() -> GeneratedMenu:

@@ -100,7 +100,6 @@ class NutriRecipeSpider(scrapy.Spider):
             if len(NutriRecipes.query.filter_by(recipe_id=current_recipe["recipe_id"]).all()) == 0:
                 ingredients = "|".join([re.sub("<.*?>", "", li.get())
                                         for li in response.css(".recipeDetailIngredients ul li")])
-                procedure = "|".join([re.sub("<.*?>", "", li.get()) for li in response.css("ol li")])
                 nutrients = {
                     "energy": float(response.css(
                         ".nutritionalValues tbody tr:nth-child(1) td:nth-child(2)::text").get().split(" ")[0]),
@@ -117,7 +116,6 @@ class NutriRecipeSpider(scrapy.Spider):
 
                 current_recipe.update({
                     "ingredients": ingredients,
-                    "procedure": procedure,
                     **nutrients
                 })
 

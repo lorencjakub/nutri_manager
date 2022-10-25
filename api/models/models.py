@@ -14,17 +14,16 @@ class NutriRecipes(PkModel):
     fiber = db.Column(db.Text, nullable=False)
     ingredients = db.Column(db.Text, nullable=False)
     en_ingredients = db.Column(db.Text, nullable=True)
-    procedure = db.Column(db.Text, nullable=False)
     tags = db.Column(db.Text, nullable=False)
     url = db.Column(db.Text, nullable=False)
     recipe_id = db.Column(db.Integer, nullable=False)
     portions = db.Column(db.Integer, nullable=False)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<Recept {name} ID {id} recipe ID {recipe_id}>".format(
             name=self.name, id=self.id, recipe_id=self.recipe_id)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "<{id} {name} {energy} {proteins} {carbs} {fats} {fiber} {url}>".format(
             id=self.id, name=self.name, energy=self.energy, proteins=self.proteins, carbs=self.carbs, fats=self.fats,
             fiber=self.fiber, url=self.url)

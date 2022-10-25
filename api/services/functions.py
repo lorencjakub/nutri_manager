@@ -26,8 +26,7 @@ def get_recipe(recipe_id: int) -> Union[RecipeData, bool]:
             "fats": round(float(recipe.fats), 0),
             "fiber": round(float(recipe.fiber), 0)
         },
-        "ingredients": recipe.ingredients,
-        "procedure": recipe.procedure
+        "ingredients": recipe.ingredients
     }
 
     return recipe_data
