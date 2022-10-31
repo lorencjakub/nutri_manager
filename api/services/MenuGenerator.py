@@ -23,6 +23,10 @@ class Menu:
         if not self.is_data_valid:
             return
 
+        self.referential_unit_energy = 4
+        self.referential_fat_energy = 9
+        self.referential_fiber_amount = 30
+
         self.max_energy = float(energy)
         self.proteins_ratio = float(proteins) if proteins != 0 else 40
         self.carbs_ratio = float(carbs) if carbs != 0 else 40
@@ -115,31 +119,30 @@ class Menu:
         self.__start_timer()
 
         menu: List[Type[NutriRecipes]] = []
-        day_energy: float = 0
-        day_carbs_energy: float = 0
-        day_proteins_energy: float = 0
-        day_fats_energy: float = 0
-        day_fiber_energy: float = 0
+        daily_energy: float = 0
+        daily_carbs_energy: float = 0
+        daily_proteins_energy: float = 0
+        daily_fats_energy: float = 0
+        daily_fiber_amount: float = 0
 
         while not parameters_fulfilled and generate_count < self.max_generate_count:
             menu = self.generate_menu()
             generate_count += 1
 
-            day_energy = sum([float(food.energy) for food in menu])
-            day_carbs_energy = sum([float(food.carbs) for food in menu]) * 4
-            day_proteins_energy = sum([float(food.proteins) for food in menu]) * 4
-            day_fats_energy = sum([float(food.fats) for food in menu]) * 9
-            day_fiber_energy = sum([float(food.fiber) for food in menu])
+            daily_energy = sum([float(food.energy) for food in menu])
+            daily_carbs_energy = sum([float(food.carbs) for food in menu]) * 4
+            daily_proteins_energy = sum([float(food.proteins) for food in menu]) * 4
+            daily_fats_energy = sum([float(food.fats) for food in menu]) * 9
+            daily_fiber_amount = sum([float(food.fiber) for food in menu])
 
-            if 0.8 * self.max_energy <= day_energy <= self.max_energy \
-                    and (day_carbs_energy / day_energy) * 100 <= self.carbs_ratio + 2.5 \
-                    and (day_proteins_energy / day_energy) * 100 <= self.proteins_ratio + 2.5\
-                    and (day_fats_energy / day_energy) * 100 <= self.fats_ratio + 2.5:
+            if 0.8 * self.max_energy <= daily_energy <= self.max_energy \
+                    and (daily_carbs_energy / daily_energy) * 100 <= self.carbs_ratio + 2.5 \
+                    and (daily_proteins_energy / daily_energy) * 100 <= self.proteins_ratio + 2.5\
+                    and (daily_fats_energy / daily_energy) * 100 <= self.fats_ratio + 2.5:
                 parameters_fulfilled = True
 
         if not parameters_fulfilled:
-            return "No generated menu does not suit defined nutrient parameters. " \
-                   "Please, try it again or change your parameters."
+            return "no_menu"
 
         return {
             "iterations": generate_count,
@@ -170,11 +173,26 @@ class Menu:
                 }
             },
             "nutrients": {
-                "energy": day_energy,
-                "carbs": round((day_carbs_energy / day_energy) * 100, 0),
-                "proteins": round((day_proteins_energy / day_energy) * 100, 0),
-                "fats": round((day_fats_energy / day_energy) * 100, 0),
-                "fiber": day_fiber_energy
+                "energy": {
+                    "amount": f'{int(daily_energy)} kcal',
+                    "ratio": round((daily_energy / self.max_energy) * 100, 0)
+                },
+                "carbs": {
+                    "amount": f'{int(round((daily_carbs_energy / self.referential_unit_energy), 0))} g',
+                    "ratio": round((daily_carbs_energy / daily_energy) * 100, 0)
+                },
+                "proteins": {
+                    "amount": f'{int(round((daily_proteins_energy / self.referential_unit_energy), 0))} g',
+                    "ratio": round((daily_proteins_energy / daily_energy) * 100, 0)
+                },
+                "fats": {
+                    "amount": f'{int(round((daily_fats_energy / self.referential_fat_energy), 0))} g',
+                    "ratio": round((daily_fats_energy / daily_energy) * 100, 0)
+                },
+                "fiber": {
+                    "amount": f'{int(daily_fiber_amount)} g',
+                    "ratio": round((daily_fiber_amount / self.referential_fiber_amount) * 100, 0)
+                }
             }
         }
 

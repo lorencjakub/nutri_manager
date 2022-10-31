@@ -1,19 +1,23 @@
-interface INutrients {
-    carbs: number,
-    energy: number,
-    fats: number,
-    fiber: number,
-    proteins: number
+interface INutrientData {
+    amount: number,
+    ratio: number
+}
+
+export interface INutrients {
+    carbs: INutrientData,
+    energy: INutrientData,
+    fats: INutrientData,
+    fiber: INutrientData,
+    proteins: INutrientData
 }
 
 export interface IFood {
     id: number,
     name: string,
     portions: number,
-    url: number,
+    url: string,
     ingredients?: string,
-    nutrients?: INutrients,
-    procedure?: string
+    nutrients?: INutrients
 }
 
 export interface IDailyMenu {

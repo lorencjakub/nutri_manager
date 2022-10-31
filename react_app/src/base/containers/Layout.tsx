@@ -1,56 +1,41 @@
-import React, { FC, Suspense, lazy } from 'react'
-import { CircularProgress, Grid } from '@mui/material'
-import { useRoutes } from 'react-router-dom'
-import routes from '../../app/utils/routes'
+import React, { Suspense, lazy, FC } from "react"
+import {
+    BrowserRouter,
+    Route,
+    Routes
+} from 'react-router-dom'
+import Loading from "../components/Loading"
 
 
-const NotFoundPage = lazy(() => import("../../app/pages/NotFound"))
+const Page = lazy(() => import("./Page"))
 
-export const Layout: FC<{}> = () => {
-  return (
-      <div style={{ display: 'flex', flexDirection: "column", backgroundColor: "green", margin: 30, height: "calc(100vh - 60px)" }}>
-          <Suspense fallback={<CircularProgress />}>
-              <Grid
-                  data-testid="containers.layout.toolbar"
-                  container
-                  spacing={1}
-                  justifyContent="center"
-                  alignItems="center"
-                  direction="row"
-                  style={{
-                      height: 85,
-                      display: 'flex',
-                      overflow: 'hidden',
-                      backgroundColor: "red",
-                      margin: 10,
-                      maxWidth: "calc(100% - 20px)"
-                  }}
-              >
-                  <h1>TOOLBAR</h1>
-              </Grid>
-              <Grid
-                  data-testid="containers.layout.content"
-                  container
-                  spacing={1}
-                  justifyContent="center"
-                  alignItems="center"
-                  direction="row"
-                  style={{
-                      height: 'calc(100% - 85px)',
-                      display: 'flex',
-                      overflow: 'hidden',
-                      backgroundColor: "red",
-                      margin: 10,
-                      maxWidth: "calc(100% - 20px)"
-                  }}
-              >
-                <Suspense fallback={<CircularProgress />}>
-                    {useRoutes([...routes]) || <NotFoundPage />}
-                </Suspense>
-              </Grid>
-          </Suspense>
-      </div>
-  )
+const Layout: FC<{}> = () => {
+    return (
+        <BrowserRouter>
+            <Routes>
+                <Route
+                    path="*"
+                    element={
+                        <Suspense fallback={
+                            <div
+                                style={{
+                                    width: "100%",
+                                    height: "100vh",
+                                    display: "flex",
+                                    justifyItems: "center",
+                                    alignItems: "center"
+                                }}
+                            >
+                                <Loading />
+                            </div>
+                        }>
+                            {<Page />}
+                        </Suspense>
+                    }
+                />
+            </Routes>
+        </BrowserRouter>
+    )
 }
 
 export default Layout

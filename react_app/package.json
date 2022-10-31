@@ -11,8 +11,9 @@
     "build": "parcel build",
     "test": "jest",
     "test:ci": "jest --silent --watchAll=false --ci --coverage",
-    "translation:extract": "node_modules/.bin/formatjs extract \"src/**/*.ts*\" --out-file \"temp.json\" --id-interpolation-pattern '[sha512:contenthash:base64:6]'",
-    "translation:compile": "formatjs compile \"temp.json\" --out-file \"src/app/config/locales/en.json\""
+    "extract": "formatjs extract \"src/**/*.tsx\" --out-file src/app/config/locales/extracted.json --id-interpolation-pattern '[sha512:contenthash:base64:6]'",
+    "compile": "formatjs compile \"src/app/config/locales/extracted.json\" --out-file src/app/config/locales/en.json",
+    "extract-compile": "formatjs extract \"src/**/*.tsx\" --out-file src/app/config/locales/extracted.json --flatten --id-interpolation-pattern '[sha512:contenthash:base64:6]' && formatjs compile \"src/app/config/locales/extracted.json\" --out-file src/app/config/locales/en.json"
   },
   "dependencies": {
     "@babel/core": "^7.19.3",
@@ -20,7 +21,7 @@
     "@babel/preset-react": "^7.18.6",
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
-    "@formatjs/cli": "^5.1.2",
+    "@formatjs/cli": "^5.1.3",
     "@mui/icons-material": "^5.10.9",
     "@mui/lab": "^5.0.0-alpha.103",
     "@mui/material": "^5.10.9",
@@ -40,8 +41,9 @@
     "notistack": "^2.0.5",
     "parcel": "^2.7.0",
     "react": "^18.2.0",
+    "react-custom-scrollbars-2": "^4.5.0",
     "react-dom": "^18.2.0",
-    "react-intl": "^6.2.0",
+    "react-intl": "^6.2.1",
     "react-router-dom": "^6.4.2",
     "ts-jest": "^29.0.3",
     "typescript": "^4.8.4"
@@ -50,6 +52,8 @@
     "process": false
   },
   "devDependencies": {
+    "@parcel/packager-raw-url": "2.7.0",
+    "@parcel/transformer-webmanifest": "2.7.0",
     "buffer": "^6.0.3"
   }
 }

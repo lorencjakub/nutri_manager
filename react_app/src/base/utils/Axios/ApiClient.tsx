@@ -4,25 +4,25 @@ import { IFood, IDailyMenu } from "./types"
 
 const apiClient = (): AxiosInstance => axios.create({
     baseURL: process.env.API_BASE_URL,
-    timeout: 10000,
+    timeout: 60000,
     headers: {
         "Content-Type": "application/json"
     },
-    transformResponse: (data) => {
-        if (data) JSON.parse(data)
-    }
+    transformResponse: [(data) => {
+        if (data) return JSON.parse(data)
+    }]
 })
 
-const getDailyMenu = async () => {
+const getDailyMenu = async (): Promise<IDailyMenu> => {
     const response = await apiClient().get<IDailyMenu>("/menu")
-    return response
+    return response.data
 }
 
-const getRecipe = async (id: number) => {
+const getRecipe = async (id: number): Promise<IFood> => {
     if (!id || isNaN(id)) throw "Error"
 
     const response = await apiClient().get<IFood>(`/menu/${parseInt(String(id))}`)
-    return response
+    return response.data
 }
 
 const ApiClient = {

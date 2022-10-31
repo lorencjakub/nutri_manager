@@ -1,10 +1,12 @@
 import React, { FC, ReactNode } from "react"
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useSnackbar } from "notistack"
+import { useErrors } from "../Errors"
 
 
 const Provider: FC<{ children: ReactNode }> = ({ children }) => {
   const { enqueueSnackbar } = useSnackbar()
+  const { parseErrorMessage } = useErrors()
 
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -12,7 +14,7 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
         staleTime: Infinity,
         onError: (err: any) => {
           enqueueSnackbar(
-            err?.response?.data || "Nespecifikovaná chyba",
+            parseErrorMessage && parseErrorMessage(err?.response?.data),
             {
               variant: "error"
             }
@@ -22,7 +24,7 @@ const Provider: FC<{ children: ReactNode }> = ({ children }) => {
       mutations: {
         onError: (err: any) => {
           enqueueSnackbar(
-            err?.response?.data || "Nespecifikovaná chyba",
+            parseErrorMessage && parseErrorMessage(err?.response?.data),
             {
               variant: "error"
             }

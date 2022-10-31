@@ -1,0 +1,137 @@
+{
+  "api_errors.no_menu": {
+    "defaultMessage": "No generated menu does suit defined nutrient parameters. Please, try it again or change your parameters."
+  },
+  "api_errors.wrong_menu_inputs": {
+    "defaultMessage": "Wrong inputs"
+  },
+  "containers.layout.content.loading.message": {
+    "defaultMessage": "Loading..."
+  },
+  "containers.layout.content.processing_backdrop.messages.chopping_vegetable": {
+    "defaultMessage": "Chopping vegetable..."
+  },
+  "containers.layout.content.processing_backdrop.messages.kebab_diablo": {
+    "defaultMessage": "Shami kebab diablo - it's like eating molten lava."
+  },
+  "containers.layout.content.processing_backdrop.messages.lembas": {
+    "defaultMessage": "Lembas bread. One small bite will fill the stomach of a grown man."
+  },
+  "containers.layout.content.processing_backdrop.messages.listers_sandwich": {
+    "defaultMessage": "Triple fried egg, chilli, chutney sandwich - inspired by reading a book on bacterialogical warfare."
+  },
+  "containers.layout.content.processing_backdrop.messages.not_little_not_much": {
+    "defaultMessage": "Not too little and not too much - that's important!"
+  },
+  "containers.layout.content.processing_backdrop.messages.pea_soup": {
+    "defaultMessage": "If you have pea soup, make sure you eat it before it eats you."
+  },
+  "containers.layout.content.processing_backdrop.messages.pepper": {
+    "defaultMessage": "Little black pepper..."
+  },
+  "containers.layout.content.processing_backdrop.messages.taters": {
+    "defaultMessage": "What's taters, precious? What's taters, eh?"
+  },
+  "containers.layout.content.processing_backdrop.messages.that_hot": {
+    "defaultMessage": "Do you really like them that hot sir?"
+  },
+  "containers.layout.content.processing_backdrop.messages.thinking": {
+    "defaultMessage": "Thinking about what to do..."
+  },
+  "containers.layout.content.processing_backdrop.messages.white_wolf": {
+    "defaultMessage": "White wolf, did you eat Red Riding Hood?"
+  },
+  "containers.layout.content.recipe_card.breakfast": {
+    "defaultMessage": "Breakfast"
+  },
+  "containers.layout.content.recipe_card.dinner": {
+    "defaultMessage": "Dinner"
+  },
+  "containers.layout.content.recipe_card.lunch": {
+    "defaultMessage": "Lunch"
+  },
+  "containers.layout.content.recipe_card.portions": {
+    "defaultMessage": "Portions: {portions}"
+  },
+  "containers.layout.content.recipe_card.recipe": {
+    "defaultMessage": "Recipe"
+  },
+  "containers.layout.content.recipe_card.snack": {
+    "defaultMessage": "Snack"
+  },
+  "errors.unspecified": {
+    "defaultMessage": "An unspecified error occured."
+  },
+  "pages.daily_menu.info.buttons.generate_new_menu": {
+    "defaultMessage": "New Menu"
+  },
+  "pages.daily_menu.info.description.first_condition": {
+    "defaultMessage": "Summ of daily energy is between 80% and 100% of maximum allowed energy for a day (default maximum energy value is 2000 kcal)."
+  },
+  "pages.daily_menu.info.description.generator": {
+    "defaultMessage": "This tool generates random menu in loop until all conditions are fulfilled. Default conditions are:"
+  },
+  "pages.daily_menu.info.description.ratios": {
+    "defaultMessage": "An error message will appear if conditions are not fulfilled in allowed count of iterations (300 by default). Then you can try generate menu again."
+  },
+  "pages.daily_menu.info.description.second_condition": {
+    "defaultMessage": "Ratios of fats, proteins and carbs are less or equal of maximum allowed ratio +2.5% tolerance (default ratios are 40% for both of proteins and carbs and 20% for fats)."
+  },
+  "pages.daily_menu.info.description.session": {
+    "defaultMessage": "Generated menu will be here for you until you will close this browser tab or generate a new menu."
+  },
+  "pages.daily_menu.info.title": {
+    "defaultMessage": "Daily Menu Generator"
+  },
+  "pages.daily_menu.meals.title": {
+    "defaultMessage": "Here is your menu for today. Enjoy!"
+  },
+  "pages.daily_menu.nutrients_table.amount_column": {
+    "defaultMessage": "Amount"
+  },
+  "pages.daily_menu.nutrients_table.amount_note": {
+    "defaultMessage": "Ratio of energy is calculated with refferency value 2000 kcal, the refferency value for fiber is 30 g."
+  },
+  "pages.daily_menu.nutrients_table.carbs": {
+    "defaultMessage": "Carbs"
+  },
+  "pages.daily_menu.nutrients_table.energy": {
+    "defaultMessage": "Energy"
+  },
+  "pages.daily_menu.nutrients_table.fats": {
+    "defaultMessage": "Fats"
+  },
+  "pages.daily_menu.nutrients_table.fiber": {
+    "defaultMessage": "Fiber"
+  },
+  "pages.daily_menu.nutrients_table.nutrient_column": {
+    "defaultMessage": "Nutrient"
+  },
+  "pages.daily_menu.nutrients_table.proteins": {
+    "defaultMessage": "Proteins"
+  },
+  "pages.daily_menu.nutrients_table.ration_column": {
+    "defaultMessage": "Ratio"
+  },
+  "pages.daily_menu.nutrients_table.title": {
+    "defaultMessage": "Nutrients table for this day"
+  },
+  "pages.homepage.about": {
+    "defaultMessage": "There should be some important text probably. However, there is only one button, so just click it and enjoy the app :)"
+  },
+  "pages.homepage.menu_button": {
+    "defaultMessage": "Get your daily menu"
+  },
+  "pages.homepage.title": {
+    "defaultMessage": "Welcome!"
+  },
+  "pages.homepage.warning": {
+    "defaultMessage": "This app should serve as the inspirating recipe generator and it does not substitute the nutrition expert!"
+  },
+  "pages.not_found.home_button": {
+    "defaultMessage": "To the homepage"
+  },
+  "pages.not_found.title": {
+    "defaultMessage": "Page not found!"
+  }
+}
