@@ -1,4 +1,4 @@
-import React, { FC } from "react"
+import React, { FC, useState } from "react"
 import {
     Button,
     Paper,
@@ -8,11 +8,15 @@ import {
 import { useTheme as useMuiTheme } from '@mui/material/styles'
 import { IFood } from '../../base/utils/Axios/types'
 import { useIntl, FormattedMessage } from "react-intl"
+import { useLocale } from "../../base/Providers/Locales"
+import WarningIcon from '@mui/icons-material/Warning'
 
 
 const RecipeCard: FC<{ mealName: string, food: IFood }> = ({ mealName, food }) => {
     const theme = useMuiTheme()
     const intl = useIntl()
+    const { locale } = useLocale()
+    const [onlyCz, setOnlyCz] = useState<boolean>(false)
     
     const handleOpenRecipeClick = (url: string) => {
         window.open(url, "_blank", "noopener,noreferrer")
@@ -23,6 +27,16 @@ const RecipeCard: FC<{ mealName: string, food: IFood }> = ({ mealName, food }) =
         lunch: intl.formatMessage({ id: "containers.layout.content.recipe_card.lunch", defaultMessage: "Lunch" }),
         snack: intl.formatMessage({ id: "containers.layout.content.recipe_card.snack", defaultMessage: "Snack" }),
         dinner: intl.formatMessage({ id: "containers.layout.content.recipe_card.dinner", defaultMessage: "Dinner" }),
+    }
+
+    var localRecipeName = food[`${locale}_name` as keyof IFood]
+    var localRecipeUrl = food[`${locale}_url` as keyof IFood]
+
+    if (!localRecipeName || !localRecipeUrl) {
+        localRecipeName = food.cs_name
+        localRecipeUrl = food.cs_url
+
+        if (!onlyCz) setOnlyCz(true)
     }
 
     return (
@@ -61,7 +75,7 @@ const RecipeCard: FC<{ mealName: string, food: IFood }> = ({ mealName, food }) =
                     variant="body2"
                     color="text.secondary"
                 >
-                    {food.name}
+                    {localRecipeName as string}
                 </Typography>
                 <Typography
                     variant="body2"
@@ -77,7 +91,7 @@ const RecipeCard: FC<{ mealName: string, food: IFood }> = ({ mealName, food }) =
                 <Button
                     variant="outlined"
                     data-testid="containers.layout.content.recipe_source_button"
-                    onClick={() => (food.url) ? handleOpenRecipeClick(food.url) : alert("Recipe without URL!")}
+                    onClick={() => handleOpenRecipeClick(localRecipeUrl as string)}
                     sx={{
                         borderColor: theme.palette.primary.light,
                         maxWidth: 120,
@@ -92,6 +106,27 @@ const RecipeCard: FC<{ mealName: string, food: IFood }> = ({ mealName, food }) =
                         {intl.formatMessage({ id: "containers.layout.content.recipe_card.recipe", defaultMessage: "Recipe" })}
                     </Typography>
                 </Button>
+                {(onlyCz && (locale !== "cs")) ? 
+                    <Grid
+                        data-testid={`containers.layout.content.recipe_card.${mealName}.only_cz`}
+                        container
+                        direction="column"
+                        alignItems="center"
+                        sx={{
+                            mt: 3
+                        }}
+                    >
+                        <WarningIcon />
+                        <Typography
+                            variant="body2"
+                            color="error"
+                            noWrap
+                        >
+                            {intl.formatMessage({ id: "containers.layout.content.recipe_card.only_cz", defaultMessage: "Sadly, this recipe exists in the database only in the czech version." })}
+                        </Typography>
+                    </Grid>
+                    : null
+                }
             </Grid>
         </Paper>
     )

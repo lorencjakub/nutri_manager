@@ -16,6 +16,7 @@
   "containers.layout.content.recipe_card.breakfast": "Snídaně",
   "containers.layout.content.recipe_card.dinner": "Večeře",
   "containers.layout.content.recipe_card.lunch": "Oběd",
+  "containers.layout.content.recipe_card.only_cz": "Bohužel tento recept existuje v databázi pouze v české verzi.",
   "containers.layout.content.recipe_card.portions": "Porce: {portions}",
   "containers.layout.content.recipe_card.recipe": "Recept",
   "containers.layout.content.recipe_card.snack": "Svačina",

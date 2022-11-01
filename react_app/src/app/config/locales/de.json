@@ -16,6 +16,7 @@
   "containers.layout.content.recipe_card.breakfast": "Frühstück",
   "containers.layout.content.recipe_card.dinner": "Abendessen",
   "containers.layout.content.recipe_card.lunch": "Mittagessen",
+  "containers.layout.content.recipe_card.only_cz": "Leider existiert dieses Rezept in der Datenbank nur in der tschechischen Version.",
   "containers.layout.content.recipe_card.portions": "Portionen: {portions}",
   "containers.layout.content.recipe_card.recipe": "Rezept",
   "containers.layout.content.recipe_card.snack": "Snack",

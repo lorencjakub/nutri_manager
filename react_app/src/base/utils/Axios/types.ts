@@ -13,10 +13,13 @@ export interface INutrients {
 
 export interface IFood {
     id: number,
-    name: string,
+    cs_name: string,
+    en_name?: string,
+    de_name?: string,
     portions: number,
-    url: string,
-    ingredients?: string,
+    cs_url: string,
+    en_url?: string,
+    de_url?: string,
     nutrients?: INutrients
 }
 
