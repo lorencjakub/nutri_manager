@@ -1,4 +1,3 @@
-# This package will contain the spiders of your Scrapy project
-#
-# Please refer to the documentation for information on how to create and manage
-# your spiders.
+from .cs_recipe_spider import CsNutriRecipeSpider
+from .de_recipe_spider import DeNutriRecipeSpider
+from .en_recipe_spider import EnNutriRecipeSpider

@@ -1,4 +1,4 @@
-from api.models.models import NutriRecipes
+from api.models.models import CsNutriRecipes, EnNutriRecipes, DeNutriRecipes
 import random
 from datetime import datetime
 from distinct_types import List, Type, GeneratedMenu, GeneratedMenuData
@@ -118,7 +118,7 @@ class Menu:
         generate_count = 0
         self.__start_timer()
 
-        menu: List[Type[NutriRecipes]] = []
+        menu: List[Type[CsNutriRecipes]] = []
         daily_energy: float = 0
         daily_carbs_energy: float = 0
         daily_proteins_energy: float = 0
@@ -144,31 +144,35 @@ class Menu:
         if not parameters_fulfilled:
             return "no_menu"
 
-        return {
+        response = {
             "iterations": generate_count,
             "foods": {
                 "breakfast": {
                     "id": menu[0].id,
-                    "name": menu[0].name,
-                    "url": menu[0].url,
+                    "recipe_id": menu[0].recipe_id,
+                    "cs_name": menu[0].name,
+                    "cs_url": menu[0].url,
                     "portions": menu[0].portions
                 },
                 "lunch": {
                     "id": menu[1].id,
-                    "name": menu[1].name,
-                    "url": menu[1].url,
+                    "recipe_id": menu[1].recipe_id,
+                    "cs_name": menu[1].name,
+                    "cs_url": menu[1].url,
                     "portions": menu[1].portions
                 },
                 "snack": {
                     "id": menu[2].id,
-                    "name": menu[2].name,
-                    "url": menu[2].url,
+                    "recipe_id": menu[2].recipe_id,
+                    "cs_name": menu[2].name,
+                    "cs_url": menu[2].url,
                     "portions": menu[2].portions
                 } if self.with_snack else None,
                 "dinner": {
                     "id": menu[3 if self.with_snack else 4].id,
-                    "name": menu[3 if self.with_snack else 4].name,
-                    "url": menu[3 if self.with_snack else 4].url,
+                    "recipe_id": menu[3 if self.with_snack else 4].recipe_id,
+                    "cs_name": menu[3 if self.with_snack else 4].name,
+                    "cs_url": menu[3 if self.with_snack else 4].url,
                     "portions": menu[3 if self.with_snack else 4].portions
                 }
             },
@@ -196,6 +200,20 @@ class Menu:
             }
         }
 
+        for food_name, food_data in response["foods"].items():
+            en_food = EnNutriRecipes.query.filter_by(recipe_id=food_data["recipe_id"]).first()
+            de_food = DeNutriRecipes.query.filter_by(recipe_id=food_data["recipe_id"]).first()
+
+            if en_food:
+                response["foods"][food_name]["en_name"] = en_food.name
+                response["foods"][food_name]["en_url"] = en_food.url
+
+            if de_food:
+                response["foods"][food_name]["de_name"] = de_food.name
+                response["foods"][food_name]["de_url"] = de_food.url
+
+        return response
+
     @staticmethod
     def generate_menu() -> GeneratedMenu:
         """
@@ -206,9 +224,9 @@ class Menu:
         :rtype List[NutriRecipes]
         """
 
-        breakfasts = NutriRecipes.query.filter(NutriRecipes.tags.contains("15")).all()
-        lunches_and_dinners = NutriRecipes.query.filter(NutriRecipes.tags.contains("16")).all()
-        snacks = NutriRecipes.query.filter(NutriRecipes.tags.contains("34")).all()
+        breakfasts = CsNutriRecipes.query.filter(CsNutriRecipes.tags.contains("15")).all()
+        lunches_and_dinners = CsNutriRecipes.query.filter(CsNutriRecipes.tags.contains("16")).all()
+        snacks = CsNutriRecipes.query.filter(CsNutriRecipes.tags.contains("34")).all()
 
         return [
             breakfasts[random.randint(0, len(breakfasts)) - 1],

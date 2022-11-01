@@ -1,5 +1,5 @@
-from data_miners.data_miners.spiders.recipe_spider import NutriRecipeSpider, EnNutriRecipeSpider
-from distinct_types import CrawlerSpider
+from data_miners.data_miners.spiders import *
+from distinct_types import CrawlerSpider, Union, Dict
 
 from twisted.internet import reactor, defer
 from scrapy.crawler import CrawlerProcess, CrawlerRunner
@@ -11,8 +11,9 @@ import sys
 
 
 class DataMiners:
-    main_nutri_recipe_spider: CrawlerSpider = NutriRecipeSpider
+    cs_nutri_recipe_spider: CrawlerSpider = CsNutriRecipeSpider
     en_nutri_recipe_spider: CrawlerSpider = EnNutriRecipeSpider
+    de_nutri_recipe_spider: CrawlerSpider = DeNutriRecipeSpider
     runner = CrawlerRunner()
     process = CrawlerProcess()
 
@@ -29,58 +30,41 @@ class DataMiners:
         self.start_time = datetime.datetime.now().timestamp()
 
     def intial_db_crawling(self) -> None:
-        print("Recipe DB is empty. The crawling of food database of zdravefitrecepty.cz..."
+        print("Recipe DB is empty. The crawling of food database has been started."
               "\nThis task will take around one minute.")
         self.use_more_spiders()
 
-    def use_more_spiders(self) -> None:
+    def use_more_spiders(self, data) -> None:
         self.start_timer()
-        self.crawl()
+        self.crawl(data)
         reactor.run()
 
         duration = datetime.datetime.now().timestamp() - self.start_time
-        print(f"Done. {self.main_nutri_recipe_spider().count} records added in {round(duration, 3)} seconds.")
-
-    def use_en_spider(self) -> None:
-        if '-U' in sys.argv or '--update' in sys.argv:
-            update = input("Some of recipes does not contain english variant of ingredients."
-                           "\nThis task will take around one minute.\nDo you want try to update?(y/n)")
-        else:
-            update = 'n'
-
-        if update.lower() == 'y':
-            print('Updating...')
-            self.start_timer()
-            self.process.crawl(EnNutriRecipeSpider)
-            self.process.start()
-
-        duration = datetime.datetime.now().timestamp() - self.start_time
-
-        if duration > 100:
-            print(f"Done. {self.en_nutri_recipe_spider().count} records updated in {round(duration, 3)} seconds.")
-
-        else:
-            print('DB check is completed, app is starting...')
+        print(f"Done. {self.cs_nutri_recipe_spider().count + self.en_nutri_recipe_spider().count + self.de_nutri_recipe_spider().count} records added in {round(duration, 3)} seconds.")
 
     @classmethod
     @defer.inlineCallbacks
-    def crawl(cls):
-        yield cls.runner.crawl(cls.main_nutri_recipe_spider)
-        yield cls.runner.crawl(cls.en_nutri_recipe_spider)
+    def crawl(cls, data):
+        if "cs" in data:
+            yield cls.runner.crawl(cls.cs_nutri_recipe_spider)
+
+        if "en" in data:
+            yield cls.runner.crawl(cls.en_nutri_recipe_spider)
+
+        if "de" in data:
+            yield cls.runner.crawl(cls.de_nutri_recipe_spider)
 
         reactor.stop()
 
 
-def crawl_nutri_recipes(rows_count: int, rows_with_en_ingredients_count: int) -> None:
+def crawl_nutri_recipes(locale_data: Dict[str, Dict[str, Union[CrawlerSpider, int]]]) -> None:
     crawler = DataMiners()
+    locales_to_update = [key for [key, value] in list(locale_data.items()) if value["row_count"] == 0]
 
-    if rows_with_en_ingredients_count == 0:
+    if locales_to_update:
         print("No data in DB. Crawling starts...")
-        crawler.use_more_spiders()
-
-    if rows_count != rows_with_en_ingredients_count:
-        crawler.use_en_spider()
+        crawler.use_more_spiders(locales_to_update)
 
     if '-U' in sys.argv or '--update' in sys.argv:
         print("Updating data...")
-        crawler.use_more_spiders()
+        crawler.use_more_spiders(list(locale_data.keys()))

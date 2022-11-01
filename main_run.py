@@ -55,7 +55,7 @@ def register_blueprints(app: Flask) -> None:
 
 
 def main_loop() -> None:
-    from api.models.models import NutriRecipes
+    from api.models.models import CsNutriRecipes, EnNutriRecipes, DeNutriRecipes
     from sqlalchemy import func
     from data_miners.data_miner import crawl_nutri_recipes
 
@@ -93,9 +93,22 @@ def main_loop() -> None:
         if "migrations" in os.listdir(os.getcwd()) and [re.findall("\.py$", v) for v in os.listdir(f'{os.getcwd()}/migrations/versions')]:
             os.system("flask db upgrade")
 
-        rows_with_en_ingredients_count = db.session.query(func.count(NutriRecipes.en_ingredients)).scalar()
-        rows_count = db.session.query(func.count(NutriRecipes.id)).scalar()
-        crawl_nutri_recipes(rows_count, rows_with_en_ingredients_count)
+        db_row_counts = {
+            "cs": {
+                "spider": CsNutriRecipes,
+                "row_count": db.session.query(func.count(CsNutriRecipes.id)).scalar()
+            },
+            "en": {
+                "spider": EnNutriRecipes,
+                "row_count": db.session.query(func.count(EnNutriRecipes.id)).scalar()
+            },
+            "de": {
+                "spider": DeNutriRecipes,
+                "row_count": db.session.query(func.count(DeNutriRecipes.id)).scalar()
+            }
+        }
+
+        crawl_nutri_recipes(db_row_counts)
 
     app.run(debug=True)
 

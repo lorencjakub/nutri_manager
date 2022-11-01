@@ -1,6 +1,6 @@
 from typing import *
 from scrapy import Spider
-from api.models import NutriRecipes
+from api.models import CsNutriRecipes
 
 
 WebTemplate = NewType("WebTemplate", object)
@@ -11,7 +11,7 @@ JsonList = NewType("JsonDict", str)
 
 CrawlerSpider = NewType('CrawlerSpider', Type[Spider])
 
-GeneratedMenu = NewType("GeneratedMenu", List[NutriRecipes])
+GeneratedMenu = NewType("GeneratedMenu", List[CsNutriRecipes])
 
 GeneratedMenuData = NewType("GeneratedMenuData",
                             Dict[str, Union[Dict[str, Dict[str, Union[str, int]]], Dict[str, float]]])

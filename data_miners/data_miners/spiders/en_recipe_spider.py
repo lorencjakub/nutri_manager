@@ -2,19 +2,19 @@ import scrapy
 from scrapy.exceptions import CloseSpider
 import re
 import time
-from typing import Tuple, List
+from typing import Tuple, List, Type, Union
 from database import db
-from api.models.models import NutriRecipes
+from api.models.models import CsNutriRecipes, EnNutriRecipes, DeNutriRecipes
 import json
 
 
-class NutriRecipeSpider(scrapy.Spider):
-    name = "nutri_recipe_spider"
+class EnNutriRecipeSpider(scrapy.Spider):
+    name = "en_nutri_recipe_spider"
     count: int = 0
     data = []
     locale: str = None
-    recipe_base_url: str = 'https://www.zdravefitrecepty.cz/recept/'
-    start_urls: List[str] = ['https://www.zdravefitrecepty.cz']
+    recipe_base_url: str = 'https://www.fitfoodwizard.com/recipe/'
+    start_urls: List[str] = ['https://www.fitfoodwizard.com']
     custom_settings = {
         'DOWNLOAD_DELAY': 0
     }
@@ -22,9 +22,7 @@ class NutriRecipeSpider(scrapy.Spider):
     def __init__(self) -> None:
         super().__init__()
         self.urls = None
-
-        if not self.locale:
-            self.set_locale('cs')
+        self.model = EnNutriRecipes
 
     def parse(self, response, **kwargs):
         data_string = [s for s in response.css("script") if "STORE_REHYDRATION" in s.get()][0].get()[45:-12]
@@ -92,69 +90,47 @@ class NutriRecipeSpider(scrapy.Spider):
         cls.recipe_base_url = base_urls[locale][0]
         cls.locale = locale
 
+    def set_db_model(self) -> Type[Union[CsNutriRecipes, DeNutriRecipes, EnNutriRecipes]]:
+        models = {
+            'cs': CsNutriRecipes,
+            'de': DeNutriRecipes,
+            'en': EnNutriRecipes,
+        }
+
+        return models[self.locale]
+
     def extract_data(self, response):
         recipe_name = response.css(".headingFlex h1::text").get()
         recipe_index, current_recipe = self.get_recipe(recipe_name)
 
-        if self.locale == 'cs':
-            if len(NutriRecipes.query.filter_by(recipe_id=current_recipe["recipe_id"]).all()) == 0:
-                ingredients = "|".join([re.sub("<.*?>", "", li.get())
-                                        for li in response.css(".recipeDetailIngredients ul li")])
-                nutrients = {
-                    "energy": float(response.css(
-                        ".nutritionalValues tbody tr:nth-child(1) td:nth-child(2)::text").get().split(" ")[0]),
-                    "proteins": float(response.css(
-                        ".nutritionalValues tbody tr:nth-child(4) td:nth-child(2)::text").get().split(" ")[0]),
-                    "carbs": float(response.css(
-                        ".nutritionalValues tbody tr:nth-child(2) td:nth-child(2)::text").get().split(" ")[0]),
-                    "fats": float(response.css(
-                        ".nutritionalValues tbody tr:nth-child(5) td:nth-child(2)::text").get().split(" ")[0]),
-                    "fiber": float(response.css(
-                        ".nutritionalValues tbody tr:nth-child(3) td:nth-child(2)::text").get().split(" ")[0]),
-                    "url": response.url
-                }
+        if len(self.model.query.filter_by(recipe_id=current_recipe["recipe_id"]).all()) == 0:
+            nutrients = {
+                "energy": float(response.css(
+                    ".nutritionalValues tbody tr:nth-child(1) td:nth-child(2)::text").get().split(" ")[0]),
+                "proteins": float(response.css(
+                    ".nutritionalValues tbody tr:nth-child(4) td:nth-child(2)::text").get().split(" ")[0]),
+                "carbs": float(response.css(
+                    ".nutritionalValues tbody tr:nth-child(2) td:nth-child(2)::text").get().split(" ")[0]),
+                "fats": float(response.css(
+                    ".nutritionalValues tbody tr:nth-child(5) td:nth-child(2)::text").get().split(" ")[0]),
+                "fiber": float(response.css(
+                    ".nutritionalValues tbody tr:nth-child(3) td:nth-child(2)::text").get().split(" ")[0]),
+                "url": response.url
+            }
 
-                current_recipe.update({
-                    "ingredients": ingredients,
-                    **nutrients
-                })
-
-                self.write_data(current_recipe)
-
-            else:
-                print(f'DB already contains recipe <<{current_recipe["name"]}>>.')
+            current_recipe.update(nutrients)
+            self.write_data(current_recipe)
 
         else:
-            if len(NutriRecipes.query.filter_by(recipe_id=current_recipe["recipe_id"]).all()) != 0:
-                ingredients = "|".join([re.sub("<.*?>", "", li.get())
-                                        for li in response.css(".recipeDetailIngredients ul li")])
-                current_recipe.update({"ingredients": ingredients})
-                self.update_data(current_recipe)
-
-            else:
-                print(f'Recipe <<{current_recipe["name"]}>> not found in DB.')
-                print(f'locale: {self.locale} recipe_id: {current_recipe["recipe_id"]} name: {current_recipe["name"]}')
+            print(f'DB already contains recipe <<{current_recipe["name"]}>>.')
 
     def write_data(self, data: dict) -> None:
-        n = NutriRecipes().create(**data)
+        n = self.model().create(**data)
 
         try:
-            if len(NutriRecipes.query.filter_by(name=data["name"]).all()) == 0:
+            if len(self.model.query.filter_by(name=data["name"]).all()) == 0:
                 db.session.add(n)
                 db.session.commit()
-
-        except Exception as e:
-            db.session.rollback()
-            print(e)
-            raise CloseSpider("Problem with adding data to the DB.")
-
-        self.count_one()
-
-    def update_data(self, data: dict) -> None:
-        try:
-            recipe = NutriRecipes.query.filter_by(recipe_id=data["recipe_id"]).first()
-            recipe.en_ingredients = data['ingredients']
-            db.session.commit()
 
         except Exception as e:
             db.session.rollback()
@@ -171,12 +147,3 @@ class NutriRecipeSpider(scrapy.Spider):
     @classmethod
     def count_one(cls):
         cls.count += 1
-
-
-class EnNutriRecipeSpider(NutriRecipeSpider):
-    name = "en_nutri_recipe_spider"
-
-    def __init__(self):
-        super().__init__()
-        self.urls = None
-        self.set_locale('en')
