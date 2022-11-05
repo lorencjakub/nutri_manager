@@ -11,7 +11,7 @@ const PageFooter: FC<{}> = () => {
     return (
         <React.Fragment>
             <Grid
-                data-testid="containers.layout.footer.container"
+                data-testid="containers.layout.footer"
                 container
                 spacing={1}
                 justifyContent="center"

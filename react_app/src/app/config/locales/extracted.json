@@ -113,7 +113,7 @@
   "pages.daily_menu.nutrients_table.proteins": {
     "defaultMessage": "Proteins"
   },
-  "pages.daily_menu.nutrients_table.ration_column": {
+  "pages.daily_menu.nutrients_table.ratio_column": {
     "defaultMessage": "Ratio"
   },
   "pages.daily_menu.nutrients_table.title": {

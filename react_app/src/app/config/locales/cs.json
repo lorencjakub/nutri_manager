@@ -37,7 +37,7 @@
   "pages.daily_menu.nutrients_table.fiber": "Vláknina",
   "pages.daily_menu.nutrients_table.nutrient_column": "Nutriční údaj",
   "pages.daily_menu.nutrients_table.proteins": "Bílkoviny",
-  "pages.daily_menu.nutrients_table.ration_column": "Poměr",
+  "pages.daily_menu.nutrients_table.ratio_column": "Poměr",
   "pages.daily_menu.nutrients_table.title": "Dnešní tabulka nutričních hodnot",
   "pages.homepage.about": "Zde by měl být nějaký důležitý text. Nicméně, je tu pouze jedno tlačítko, tak na něj klikni a ať aplikace slouží :)",
   "pages.homepage.menu_button": "Získej jídelníček",

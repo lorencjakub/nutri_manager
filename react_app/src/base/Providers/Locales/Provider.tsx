@@ -8,7 +8,7 @@ import {
 } from "../../../app/config/locales"
 
 
-function messagesGetter(locale: string) {
+export function messagesGetter(locale: string) {
     switch (locale) {
         case "cs":
             return csMessages

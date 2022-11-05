@@ -13,6 +13,7 @@ export interface INutrients {
 
 export interface IFood {
     id: number,
+    recipe_id?: number,
     cs_name: string,
     en_name?: string,
     de_name?: string,

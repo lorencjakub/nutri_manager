@@ -52,6 +52,7 @@
     "process": false
   },
   "devDependencies": {
+    "@babel/preset-typescript": "^7.18.6",
     "@parcel/packager-raw-url": "2.7.0",
     "@parcel/transformer-webmanifest": "2.7.0",
     "buffer": "^6.0.3"

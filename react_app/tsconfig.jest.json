@@ -4,7 +4,6 @@
     "compilerOptions": {
         "jsx": "react-jsx",
         "paths": {
-            "test-utils": ["./src/base/utils/test-utils"],
             "react": [ "./node_modules/@types/react" ]
         },
         "allowSyntheticDefaultImports": true,

@@ -35,10 +35,13 @@ const HomePage: FC<{}> = () => {
             <Grid
                 data-testid="pages.homepage.container"
                 container
-                direction="column"
+                direction="row"
                 spacing={1}
                 justifyContent="center"
                 alignItems="center"
+                sx={{
+                    overflow: "auto"
+                }}
             >
                 <Grid
                     data-testid="pages.homepage.title"

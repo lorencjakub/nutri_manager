@@ -3,13 +3,12 @@ import CircularProgress from '@mui/material/CircularProgress'
 import { CacheProvider } from '@emotion/react'
 import createCache from '@emotion/cache'
 import { ThemeModeProvider } from '../Providers/ThemeMode'
-import { LocaleProvider } from "../Providers/Locales"
+import { LocaleProvider, useLocale } from "../Providers/Locales"
 import {
     QueryClientProvider,
     NotistackProvider
 } from "../Providers"
 import { IntlProvider } from "react-intl"
-import { useLocale } from "../Providers/Locales"
 import Loading from "../components/Loading"
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles'
 import themes from "../../app/config/themes"

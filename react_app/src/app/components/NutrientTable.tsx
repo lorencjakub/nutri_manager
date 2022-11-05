@@ -77,7 +77,7 @@ const NutrientsTable: FC<{ nutrients: INutrients, tableName: string }> = ({ nutr
     const headers: { [key: string] : { [key: string] : string } } = {
         "nutrient": {
             "amount": intl.formatMessage({ id: "pages.daily_menu.nutrients_table.amount_column", defaultMessage: "Amount" }),
-            "ratio": intl.formatMessage({ id: "pages.daily_menu.nutrients_table.ration_column", defaultMessage: "Ratio" })        
+            "ratio": intl.formatMessage({ id: "pages.daily_menu.nutrients_table.ratio_column", defaultMessage: "Ratio" })        
         }
     }
     

@@ -43,7 +43,6 @@ const NewMenuButton: FC<{}> =()=> {
     )
 
     useEffect(() => {
-        console.log(generatingMenu)
         setIsFetching && setIsFetching((generatingMenu === "fetching"))
     }, [generatingMenu])
 
