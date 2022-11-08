@@ -20,7 +20,7 @@ def get_recipe(recipe_id: int) -> Union[RecipeData, bool]:
         "url": recipe.url,
         "portions": recipe.portions,
         "nutrients": {
-            "energy": recipe.energy,
+            "energy": round(float(recipe.energy), 0),
             "carbs": round(float(recipe.carbs), 0),
             "proteins": round(float(recipe.proteins), 0),
             "fats": round(float(recipe.fats), 0),

@@ -1,4 +1,4 @@
-from flask import jsonify, Blueprint, request, Response, json
+from flask import jsonify, Blueprint, request, Response
 from api.services import generate_menu, get_recipe
 
 
@@ -10,8 +10,8 @@ def get_menu() -> Response:
     data = dict(request.args)
     response = generate_menu(**data)
 
-    return Response(json.dumps(response), 200 if isinstance(response, dict) else 400) if response \
-        else Response("wrong_menu_inputs", 400)
+    return jsonify(response) if response \
+        else Response("no_menu" if response is None else "wrong_menu_inputs", 400)
 
 
 @MENU_BLUEPRINT.route("/menu/<recipe_id>")
