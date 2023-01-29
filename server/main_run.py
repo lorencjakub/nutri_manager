@@ -98,8 +98,7 @@ def main_loop() -> Union[None, Flask]:
     app = create_app()
 
     with app.app_context():
-        empty_db = (len(inspect(db.engine).get_table_names()) == 0) if BE_ENV == "prod" else \
-            "database.sqlite3" not in os.listdir(os.getcwd())
+        empty_db = (len(inspect(db.engine).get_table_names()) == 0) if BE_ENV != "test" else False
 
         if empty_db:
             print('No DB found. Creating...')
@@ -111,24 +110,12 @@ def main_loop() -> Union[None, Flask]:
             os.system("flask db init")
             print('A new database has been created.')
 
-        if "migrations" not in os.listdir(os.getcwd()):
-            if "-m" in sys.argv:
-                index_of_message_flag = sys.argv.index("-m")
-                message = sys.argv[index_of_message_flag + 1]
-                os.system(f'flask db init && flask db migrate -m "{message}"')
-
-            else:
-                os.system("flask db init && flask db migrate")
-
-        elif "-m" in sys.argv:
+        if "-m" in sys.argv:
             index_of_message_flag = sys.argv.index("-m")
             message = sys.argv[index_of_message_flag + 1]
             os.system(f'flask db migrate -m "{message}"')
 
-        if "versions" in os.listdir(f'{os.getcwd()}/migrations') and [
-            re.findall("py$", v) for v in os.listdir(f'{os.getcwd()}/migrations/versions')
-        ]:
-            os.system("flask db upgrade")
+        os.system("flask db upgrade")
 
         if BE_ENV != "test":
             db_row_counts = {

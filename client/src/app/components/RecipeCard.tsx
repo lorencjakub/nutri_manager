@@ -1,22 +1,36 @@
-import React, { FC, useState } from "react"
+import { FC, useState, useEffect } from "react"
 import {
     Button,
     Paper,
     Typography,
-    Grid
+    Grid,
+    Stack,
+    IconButton,
+    CircularProgress,
+    Backdrop
 } from "@mui/material"
 import { useTheme as useMuiTheme } from '@mui/material/styles'
-import { IFood } from '../../base/utils/Axios/types'
+import { IDailyMenu, IFood } from '../../base/utils/Axios/types'
 import { useIntl, FormattedMessage } from "react-intl"
 import { useLocale } from "../../base/Providers/Locales"
-import WarningIcon from '@mui/icons-material/Warning'
+import {
+    Warning as WarningIcon,
+    Cached as ChangeIcon
+} from '@mui/icons-material'
+import { useDailyMenu } from "../Providers/DailyMenu"
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import ApiClient from '../../base/utils/Axios/ApiClient'
+import { AxiosError } from 'axios'
 
 
-const RecipeCard: FC<{ mealName: string, food: IFood }> = ({ mealName, food }) => {
+const RecipeCard: FC<{ mealName: keyof IDailyMenu["foods"], food: IFood }> = ({ mealName, food }) => {
     const theme = useMuiTheme()
     const intl = useIntl()
+    const client = useQueryClient()
+    const { isRandomMenu = false, fetchedMenu = { foods: {} }, isFetching, setIsFetching, setIsRandomMenu, setFetchedMenu } = useDailyMenu()
     const { locale } = useLocale()
     const [onlyCz, setOnlyCz] = useState<boolean>(false)
+    const [showLoadingBackdrop, setShowLoadingBackdrop] = useState<boolean>(false)
     
     const handleOpenRecipeClick = (url: string) => {
         window.open(url, "_blank", "noopener,noreferrer")
@@ -39,6 +53,58 @@ const RecipeCard: FC<{ mealName: string, food: IFood }> = ({ mealName, food }) =
         if (!onlyCz) setOnlyCz(true)
     }
 
+    const {
+        mutate: handleReloadMealClick,
+        status: reloadingMenu
+    } = useMutation<IDailyMenu, AxiosError>(
+        [`reload_meal_${mealName}`],
+        async () => await ApiClient.reloadMeal(fetchedMenu?.foods as IDailyMenu["foods"], mealName),
+        {
+            retry: 0,
+            cacheTime: 0,
+            onSuccess: (data) => {
+                var newMenu = { ...fetchedMenu as IDailyMenu }
+                newMenu.foods[mealName] = food
+                setFetchedMenu && setFetchedMenu(newMenu)
+                setIsRandomMenu && setIsRandomMenu(false)
+            }
+        }
+    )
+
+    const {
+        mutate: handleRandomReloadMealClick,
+        status: reloadingRandomMenu
+    } = useMutation<IDailyMenu, AxiosError>(
+        [`reload_random_meal_${mealName}`],
+        async () => await ApiClient.reloadRandomMeal(fetchedMenu?.foods as IDailyMenu["foods"], mealName),
+        {
+            retry: 0,
+            cacheTime: 0,
+            onSuccess: (data) => {
+                var newMenu = { ...fetchedMenu as IDailyMenu }
+                newMenu.foods[mealName] = data.foods[mealName] as IFood
+                newMenu.nutrients = data.nutrients
+
+                setFetchedMenu && setFetchedMenu(newMenu)
+                setIsRandomMenu && setIsRandomMenu(true)
+            }
+        }
+    )
+
+    useEffect(() => {
+        if (client.isMutating()) {
+            setTimeout(() => {
+                if (client.isMutating()) {
+                    setShowLoadingBackdrop(true)
+                } else {
+                    setShowLoadingBackdrop(false)
+                }
+            }, 1000)
+        } else {
+            setShowLoadingBackdrop(false)
+        }
+    }, [reloadingRandomMenu])
+
     return (
         <Paper
             elevation={1}
@@ -56,21 +122,61 @@ const RecipeCard: FC<{ mealName: string, food: IFood }> = ({ mealName, food }) =
                 borderRadius: 5
             }}
         >
+            <Backdrop
+                sx={{
+                    backgroundColor: '#ffffff99',
+                    zIndex: (theme) => theme.zIndex.drawer + 100,
+                    position: "absolute"
+                }}
+                open={showLoadingBackdrop}
+            >
+                <CircularProgress color="primary" />
+            </Backdrop>
             <Grid
                 data-testid={`containers.layout.content.recipe_card.${mealName}`}
                 container
                 direction="column"
             >
-                <Typography
-                    variant="h6"
-                    color="text.primary"
-                    noWrap
-                    sx={{
-                        mb: 1
-                    }}
+                <Grid
+                    data-testid={`containers.layout.content.recipe_card.${mealName}.header`}
+                    container
+                    direction="row"
                 >
-                    {mealNames[mealName]}
-                </Typography>
+                    <Typography
+                        variant="h6"
+                        color="text.primary"
+                        noWrap
+                        sx={{
+                            mb: 1
+                        }}
+                    >
+                        {mealNames[mealName]}
+                    </Typography>
+                    <Stack
+                        direction="row"
+                        justifyContent="end"
+                    >
+                        {
+                            (isRandomMenu) ?
+                            <IconButton
+                                data-testid={`containers.layout.content.${mealName}.header.${(isRandomMenu) ? "random_reload_button" : "reload_button"}`}
+                                onClick={
+                                    (isRandomMenu) ?
+                                    () => handleRandomReloadMealClick()
+                                    :
+                                    () => handleReloadMealClick()
+                                }
+                                sx={{
+                                    borderColor: theme.palette.primary.light,
+                                }}
+                            >
+                                <ChangeIcon />
+                            </IconButton>
+                            :
+                            null
+                        }
+                    </Stack>
+                </Grid>
                 <Typography
                     variant="body2"
                     color="text.secondary"

@@ -1,11 +1,21 @@
 from .MenuGenerator import Menu
-from distinct_types import Union, Tuple, GeneratedMenuData, RecipeData
+from distinct_types import Union, Tuple, GeneratedMenuData, RecipeData, List
 from api.models import CsNutriRecipes
 
 
 def generate_menu(**kwargs) -> Union[bool, Tuple[GeneratedMenuData, int]]:
     menu = Menu(**kwargs)
     return menu.create_menu() if menu.is_valid() else False
+
+
+def generate_random_menu() -> Union[bool, Tuple[GeneratedMenuData, int]]:
+    menu = Menu().create_menu(True)
+    return menu
+
+
+def generate_random_meal(meal_name: str, meal_ids: List[str]) -> Union[bool, RecipeData]:
+    menu = Menu().create_menu(True, meal_name, meal_ids)
+    return menu
 
 
 def get_recipe(recipe_id: int) -> Union[RecipeData, bool]:

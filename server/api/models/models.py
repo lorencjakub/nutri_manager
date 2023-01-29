@@ -1,10 +1,20 @@
 """Database module, including the SQLAlchemy database object and DB-related utilities."""
 from database import db, PkModel
+import os
+
+
+BE_ENV = os.environ.get("BE_ENV", default="dev")
+DRIVERNAME = __import__("config_%s" % (BE_ENV,)).DB_DRIVERNAME
 
 
 class CsNutriRecipes(PkModel):
+    module = __import__("sqlalchemy.dialects.%s" % (DRIVERNAME,)).dialects
+    module = getattr(module, DRIVERNAME)
+    JSON = module.ARRAY(db.Integer) if DRIVERNAME == "postgresql" else module.JSON
+
     __tablename__ = "cs_nutri_recipes"
     __table_args__ = {'extend_existing': True}
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
     energy = db.Column(db.Text, nullable=False)
@@ -12,7 +22,7 @@ class CsNutriRecipes(PkModel):
     carbs = db.Column(db.Text, nullable=False)
     fats = db.Column(db.Text, nullable=False)
     fiber = db.Column(db.Text, nullable=False)
-    tags = db.Column(db.Text, nullable=False)
+    tags = db.Column(JSON)
     url = db.Column(db.Text, nullable=False)
     recipe_id = db.Column(db.Integer, nullable=False)
     portions = db.Column(db.Integer, nullable=False)
@@ -28,8 +38,13 @@ class CsNutriRecipes(PkModel):
 
 
 class EnNutriRecipes(PkModel):
+    module = __import__("sqlalchemy.dialects.%s" % (DRIVERNAME,)).dialects
+    module = getattr(module, DRIVERNAME)
+    JSON = module.ARRAY(db.Integer) if DRIVERNAME == "postgresql" else module.JSON
+
     __tablename__ = "en_nutri_recipes"
     __table_args__ = {'extend_existing': True}
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
     energy = db.Column(db.Text, nullable=False)
@@ -37,7 +52,7 @@ class EnNutriRecipes(PkModel):
     carbs = db.Column(db.Text, nullable=False)
     fats = db.Column(db.Text, nullable=False)
     fiber = db.Column(db.Text, nullable=False)
-    tags = db.Column(db.Text, nullable=False)
+    tags = db.Column(JSON)
     url = db.Column(db.Text, nullable=False)
     recipe_id = db.Column(db.Integer, nullable=False)
     portions = db.Column(db.Integer, nullable=False)
@@ -53,8 +68,13 @@ class EnNutriRecipes(PkModel):
 
 
 class DeNutriRecipes(PkModel):
+    module = __import__("sqlalchemy.dialects.%s" % (DRIVERNAME,)).dialects
+    module = getattr(module, DRIVERNAME)
+    JSON = module.ARRAY(db.Integer) if DRIVERNAME == "postgresql" else module.JSON
+
     __tablename__ = "de_nutri_recipes"
     __table_args__ = {'extend_existing': True}
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
     energy = db.Column(db.Text, nullable=False)
@@ -62,7 +82,7 @@ class DeNutriRecipes(PkModel):
     carbs = db.Column(db.Text, nullable=False)
     fats = db.Column(db.Text, nullable=False)
     fiber = db.Column(db.Text, nullable=False)
-    tags = db.Column(db.Text, nullable=False)
+    tags = db.Column(JSON)
     url = db.Column(db.Text, nullable=False)
     recipe_id = db.Column(db.Integer, nullable=False)
     portions = db.Column(db.Integer, nullable=False)

@@ -4,9 +4,10 @@ import {
     Paper,
     Typography,
     Grid,
+    Stack,
     useMediaQuery
 } from "@mui/material"
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import ApiClient from '../../base/utils/Axios/ApiClient'
 import {
     IFood,
@@ -19,31 +20,35 @@ import { useTheme as useMuiTheme } from '@mui/material/styles'
 import { useIntl } from "react-intl"
 import ProcessingBackdrop from '../components/ProcessingBackdrop'
 import { useDailyMenu } from '../Providers/DailyMenu'
+import { FormDataProvider, useFormData } from '../Providers/FormData'
+import Form from '../components/Form'
+import { IFormFields } from '../../base/utils/types'
 
 
-const NewMenuButton: FC<{}> =()=> {
-    const { setFetchedMenu, setIsFetching } = useDailyMenu()
+const NewMenuButton: FC<{}> = () => {
+    const { formData = {} } = useFormData()
+    const { setFetchedMenu, setIsFetching, setIsRandomMenu } = useDailyMenu()
     const theme = useMuiTheme()
     const intl = useIntl()
 
     const {
-        refetch: handleGenerateMenuClick,
-        fetchStatus: generatingMenu
-    } = useQuery<IDailyMenu, AxiosError>(
+        mutate: handleGenerateMenuClick,
+        status: generatingMenu
+    } = useMutation<IDailyMenu, AxiosError>(
         ["query_daily_menu"],
-        async () => await ApiClient.getDailyMenu(),
+        async () => await ApiClient.getDailyMenu(formData),
         {
             retry: 0,
             cacheTime: 0,
-            enabled: false,
             onSuccess: (data) => {
                 setFetchedMenu && setFetchedMenu(data)
+                setIsRandomMenu && setIsRandomMenu(false)
             }
         }
     )
 
     useEffect(() => {
-        setIsFetching && setIsFetching((generatingMenu === "fetching"))
+        setIsFetching && setIsFetching((generatingMenu === "loading"))
     }, [generatingMenu])
 
     return (
@@ -68,10 +73,133 @@ const NewMenuButton: FC<{}> =()=> {
             </Typography>
         </Button>
     )
+}
+
+const RandomMenuButton: FC<{}> = () => {
+    const { setFetchedMenu, setIsFetching, setIsRandomMenu } = useDailyMenu()
+    const theme = useMuiTheme()
+    const intl = useIntl()
+
+    const {
+        refetch: handleGenerateMenuClick,
+        fetchStatus: generatingMenu
+    } = useQuery<IDailyMenu, AxiosError>(
+        ["query_random_daily_menu"],
+        async () => await ApiClient.getRandomDailyMenu(),
+        {
+            retry: 0,
+            cacheTime: 0,
+            enabled: false,
+            onSuccess: (data) => {
+                setFetchedMenu && setFetchedMenu(data)
+                setIsRandomMenu && setIsRandomMenu(true)
+            }
+        }
+    )
+
+    useEffect(() => {
+        setIsFetching && setIsFetching((generatingMenu === "fetching"))
+    }, [generatingMenu])
+
+    return (
+        <Button
+            onClick={() => {
+                setFetchedMenu && setFetchedMenu(null)
+                handleGenerateMenuClick()
+            }}
+            data-testid="pages.daily_menu.info.buttons.generate_new_random_menu"
+            sx={{
+                backgroundColor: theme.palette.text.primary,
+                maxWidth: 160,
+                m: 2
+            }}
+        >
+            <Typography
+                variant="body2"
+                color="primary.dark"
+                noWrap
+            >
+                {intl.formatMessage({ id: "pages.daily_menu.info.buttons.generate_new_random_menu", defaultMessage: "New Random Menu" })}
+            </Typography>
+        </Button>
+    )
+}
+
+const ResetMenuButton: FC<{}> = () => {
+    const { setFetchedMenu } = useDailyMenu()
+    const theme = useMuiTheme()
+    const intl = useIntl()
+
+    return (
+        <Button
+            onClick={() => {
+                setFetchedMenu && setFetchedMenu(null)
+            }}
+            data-testid="pages.daily_menu.info.buttons.generate_new_menu"
+            sx={{
+                backgroundColor: theme.palette.text.primary,
+                maxWidth: 160,
+                m: 2
+            }}
+        >
+            <Typography
+                variant="body2"
+                color="primary.dark"
+                noWrap
+            >
+                {intl.formatMessage({ id: "pages.daily_menu.info.buttons.generate_new_menu", defaultMessage: "New Menu" })}
+            </Typography>
+        </Button>
+    )
 } 
 
 const DailyMenuInfo: FC<{}> =() => {
     const intl = useIntl()
+
+    const fields: IFormFields = {
+        energy: {
+            label: intl.formatMessage({ id: "page.form.energy.label", defaultMessage: "Max. energy" }),
+            type: "text",
+            defaultvalue: 2000
+        },
+        minimum_energy_check: {
+            label: intl.formatMessage({ id: "page.form.energy.minimum_energy_check", defaultMessage: "Allow menu with energy lower than 80% of max. energy" }),
+            type: "checkbox",
+            defaultvalue: false
+        },
+        carbs: {
+            label: intl.formatMessage({ id: "page.form.energy.carbs_ratio", defaultMessage: "Carbs ratio" }),
+            type: "binded_slider",
+            defaultvalue: 40
+        },
+        proteins: {
+            label: intl.formatMessage({ id: "page.form.energy.proteins_ratio", defaultMessage: "Proteins ratio" }),
+            type: "binded_slider",
+            defaultvalue: 40
+        },
+        fats: {
+            label: intl.formatMessage({ id: "page.form.energy.fats_ratio", defaultMessage: "Fats ratio" }),
+            type: "binded_slider",
+            defaultvalue: 20
+        },
+        with_snack: {
+            label: intl.formatMessage({ id: "page.form.energy.with_snack", defaultMessage: "Include snack" }),
+            type: "checkbox",
+            defaultvalue: true
+        },
+        // tags: {
+        //     label: intl.formatMessage({ id: "page.form.energy.tags", defaultMessage: "Tags and categories" }),
+        //     type: "multiselect",
+        //     defaultvalue: []
+        // },
+        // iterations: {
+        //     label: intl.formatMessage({ id: "page.form.iterations", defaultMessage: "Max. count of iterations" }),
+        //     type: "slider",
+        //     defaultvalue: 300,
+        //     min: 100,
+        //     max: 500
+        // },
+    }
 
     return (
         <React.Fragment>
@@ -187,13 +315,22 @@ const DailyMenuInfo: FC<{}> =() => {
                     justifyItems="center"
                     style={{
                         display: 'flex',
-                        flexDirection: "row"
+                        flexDirection: "column"
                     }}
                     sx={{
                         backgroundColor: "background.default"
                     }}
                 >
-                    <NewMenuButton />
+                    <FormDataProvider>
+                        <Form fields={fields} />
+                        <Stack
+                            direction="row"
+                            justifyContent="center"
+                        >
+                            <NewMenuButton />
+                            <RandomMenuButton />    
+                        </Stack>
+                    </FormDataProvider>
                 </Grid>
             </Grid>
         </React.Fragment>
@@ -235,7 +372,7 @@ const DailyMenuData: FC<{}> =() => {
                     {intl.formatMessage({ id: "pages.daily_menu.meals.title", defaultMessage: "Here is your menu for today. Enjoy!" })}
                 </Typography>
                 {fetchedMenu?.foods && Object.entries(fetchedMenu?.foods).map(([mealName, food]: [string, IFood]) => {
-                    return (
+                    if (food) return (
                         <RecipeCard
                             mealName={mealName}
                             food={food}
@@ -286,7 +423,13 @@ const DailyMenuData: FC<{}> =() => {
                 >
                     {intl.formatMessage({ id: "pages.daily_menu.nutrients_table.amount_note", defaultMessage: "Ratio of energy is calculated with refferency value 2000 kcal, the refferency value for fiber is 30 g." })}
                 </Typography>
-                <NewMenuButton />
+                <Stack
+                    direction="row"
+                    justifyContent="center"
+                >
+                    <ResetMenuButton />
+                    <RandomMenuButton />    
+                </Stack>
             </Grid>
         </React.Fragment>
     )

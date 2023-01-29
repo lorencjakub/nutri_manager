@@ -1,4 +1,4 @@
-import React, { FC } from "react"
+import { FC } from "react"
 import Context from "./Context"
 import { FormattedMessage } from "react-intl"
 

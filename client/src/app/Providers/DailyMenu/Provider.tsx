@@ -7,6 +7,7 @@ const DailyMenuProvider: FC<{ children: ReactNode, persistKey?: string }> = ({ c
     const persistDailyMenu = sessionStorage.getItem(persistKey)
     const [fetchedMenu, setFetchedMenu] = useState<IDailyMenu | null>(persistDailyMenu && JSON.parse(persistDailyMenu) || null)
     const [isFetching, setIsFetching] = useState<boolean>(false)
+    const [isRandomMenu, setIsRandomMenu] = useState<boolean>(false)
 
     useEffect(() => {
         setFetchedMenu(fetchedMenu || null)
@@ -14,7 +15,7 @@ const DailyMenuProvider: FC<{ children: ReactNode, persistKey?: string }> = ({ c
     }, [fetchedMenu])
 
     return (
-        <Context.Provider value={{ fetchedMenu, setFetchedMenu, isFetching, setIsFetching }}>
+        <Context.Provider value={{ fetchedMenu, setFetchedMenu, isFetching, setIsFetching, isRandomMenu, setIsRandomMenu }}>
             {children}
         </Context.Provider>
     )
