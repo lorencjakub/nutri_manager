@@ -14,7 +14,7 @@ from distinct_types import Union
 
 
 BE_ENV = os.environ.get("BE_ENV")
-
+print(BE_ENV)
 
 def create_app(with_secutiry: bool = True) -> Flask:
     """Create application factory
