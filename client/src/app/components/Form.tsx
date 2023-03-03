@@ -1,16 +1,13 @@
-import React, { FC, useState, useEffect } from "react"
+import React, { FC, useEffect } from "react"
 import {
     FormControlLabel,
-    Button,
     TextField,
     Checkbox,
-    Select,
     Paper,
     Box,
     Grid,
     Typography,
     Slider,
-    Input,
     Tooltip,
     SliderValueLabelProps
 } from "@mui/material"
@@ -21,23 +18,16 @@ import {
     IFormFields
 } from "../../base/utils/types"
 import CustomMultiSelect from "../../base/components/CustomMultiSelect"
+import { useTheme as useMuiTheme } from "@mui/material/styles"
 
-
-function ValueLabelComponent(props: SliderValueLabelProps) {
-    const { children, value } = props;
-  
-    return (
-        <Tooltip enterTouchDelay={0} placement="top" title={value}>
-            {children}
-        </Tooltip>
-    )
-  }
 
 const Form: FC<{ fields: IFormFields}> = ({ fields = {} }) => {
     const { formData = {}, setFormData } = useFormData()
+    const theme = useMuiTheme()
 
     useEffect(() => {
         var initialValues: IFormData = {}
+
         Object.entries(fields).forEach(([fieldName, fieldData]) => { initialValues[fieldName] = fieldData.defaultvalue })
         if (setFormData) setFormData(initialValues)
     }, [])
@@ -77,9 +67,7 @@ const Form: FC<{ fields: IFormFields}> = ({ fields = {} }) => {
     return (
         <Paper
             elevation={1}
-            sx={{
-                
-            }}
+            data-testid="pages.form"
         >
             <Grid
                 container
@@ -93,19 +81,27 @@ const Form: FC<{ fields: IFormFields}> = ({ fields = {} }) => {
                         return (
                             <Grid
                                 item
+                                key={fieldName}
                                 xs={12}
                                 sx={{
                                     my: 1
                                 }}
                             >
                                 <FormControlLabel
+                                    key={`${fieldName}_checkbox_label`}
                                     label={fieldData.label}
                                     control={
                                         <Checkbox
+                                            data-testid={`${fieldName}_checkbox`}
+                                            key={`${fieldName}_checkbox_input`}
                                             checked={(formData[fieldName] == undefined) ? Boolean(fieldData.defaultvalue) : Boolean(formData[fieldName])}
                                             onChange={(e, checked) => handleChangeCheckboxField(fieldName, checked)}
                                             required={fieldData.required}
                                             disabled={fieldData.disabled}
+                                            style={{
+                                                color: theme.palette.text.primary,
+                                                borderColor: theme.palette.text.primary
+                                            }}
                                         />
                                     }
                                 />
@@ -114,17 +110,29 @@ const Form: FC<{ fields: IFormFields}> = ({ fields = {} }) => {
                     } else if (fieldData.type && fieldData.type.includes("slider")) {
                         return (
                             <Box
+                                key={`${fieldName}_slider.box`}
                                 sx={{
                                     width: 250,
                                     my: 1
                                 }}
                             >
-                                <Typography id="input-slider" gutterBottom>
+                                <Typography id="input-slider" gutterBottom color="text.secondary">
                                     {fieldData.label}
                                 </Typography>
-                                <Grid container spacing={2} alignItems="center">
-                                    <Grid item xs>
+                                <Grid
+                                    container
+                                    spacing={2}
+                                    alignItems="center"
+                                    key={`${fieldName}_slider.outer_grid`}
+                                >
+                                    <Grid
+                                        item
+                                        xs
+                                        key={`${fieldName}_slider.inner_grid`}
+                                    >
                                         <Slider
+                                            data-testid={`${fieldName}_slider`}
+                                            key={`${fieldName}_slider.component`}
                                             value={(Number(formData[fieldName]) === 0) ? 0 : Number(formData[fieldName]) || Number(fieldData.defaultvalue)}
                                             onChange={(event: Event, value: number | number[], activeThumb: number) => {
                                                 (fieldData.type == "binded_slider") ?
@@ -134,9 +142,6 @@ const Form: FC<{ fields: IFormFields}> = ({ fields = {} }) => {
                                             }}
                                             aria-labelledby="input-slider"
                                             valueLabelDisplay="auto"
-                                            slots={{
-                                                valueLabel: ValueLabelComponent,
-                                            }}
                                             aria-label="custom thumb label"
                                             defaultValue={Number(fieldData.defaultvalue)}
                                             min={Number(fieldData.min) || 0}
@@ -147,10 +152,11 @@ const Form: FC<{ fields: IFormFields}> = ({ fields = {} }) => {
                             </Box>
                         )
                     } else if (fieldData.type == "multiselect") {
-                        return <CustomMultiSelect inputName={fieldName} data={fieldData} />
+                        return <CustomMultiSelect inputName={fieldName} inputProps={fieldData} key={`${fieldName}_multiselect`} />
                     } else {
                         return (
                             <Grid
+                                key={`${fieldName}_textfield.grid`}
                                 item
                                 xs={12}
                                 sx={{
@@ -158,7 +164,10 @@ const Form: FC<{ fields: IFormFields}> = ({ fields = {} }) => {
                                 }}
                             >
                                 <TextField
+                                    data-testid={`${fieldName}_text_field`}
+                                    key={`${fieldName}_textfield.input`}
                                     label={fieldData.label}
+                                    name={fieldName}
                                     value={formData[fieldName] || fieldData.defaultvalue}
                                     type={fieldData.type || "text"}
                                     onChange={handleChangeInput}

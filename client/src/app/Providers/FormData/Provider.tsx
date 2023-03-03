@@ -1,4 +1,4 @@
-import { FC, useState } from "react"
+import React, { FC, useState } from "react"
 import Context from "./Context"
 import { IFormData } from "../../../base/utils/types"
 

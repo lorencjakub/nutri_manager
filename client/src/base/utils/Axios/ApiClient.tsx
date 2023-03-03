@@ -5,7 +5,7 @@ import { IFood, IDailyMenu } from "./types"
 
 const apiClient = (): AxiosInstance => axios.create({
     baseURL: process.env.API_BASE_URL,
-    timeout: 60000,
+    timeout: 15000,
     headers: {
         "Content-Type": "application/json",
         "CorsTrigger": "cors"
@@ -26,18 +26,20 @@ const getRandomDailyMenu = async (): Promise<IDailyMenu> => {
     return response.data
 }
 
-const reloadMeal = async (foods: IDailyMenu["foods"], mealToReload: string, isRandom?: boolean): Promise<IDailyMenu> => {
-    const response = await apiClient().post<IDailyMenu>("/reload_meal", { foods: foods, meal_to_reload: mealToReload })
-    return response.data
-}
-
-const reloadRandomMeal = async (foods: IDailyMenu["foods"], mealToReload: string): Promise<IDailyMenu> => {
+const reloadMeal = async (foods: IDailyMenu["foods"], mealToReload: string, data: IFormData): Promise<IDailyMenu> => {
     var mealIds: number[] = []
+
     Object.entries(foods).map(([mealName, mealData]) => {
         if (mealName != mealToReload) mealIds.push(mealData.id)
     })
 
-    const response = await apiClient().post<IDailyMenu>("/random_reload_meal", { meal_ids: mealIds, meal_to_reload: mealToReload })
+    const body = {
+        meal_ids: mealIds,
+        meal_to_reload: mealToReload,
+        menu_data: data
+    }
+
+    const response = await apiClient().post<IDailyMenu>("/reload_meal", body)
     return response.data
 }
 
@@ -52,7 +54,6 @@ const ApiClient = {
     getDailyMenu,
     getRandomDailyMenu,
     reloadMeal,
-    reloadRandomMeal,
     getRecipe
 }
 

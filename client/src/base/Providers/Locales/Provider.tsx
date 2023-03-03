@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from "react"
+import React, { FC, useState, useEffect } from "react"
 import Context from "./Context"
 import {
     flagUrls,

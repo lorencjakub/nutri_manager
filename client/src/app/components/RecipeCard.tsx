@@ -1,37 +1,47 @@
-import { FC, useState, useEffect } from "react"
+import React, { FC, useState, useEffect } from "react"
 import {
     Button,
     Paper,
     Typography,
     Grid,
     Stack,
-    IconButton,
-    CircularProgress,
-    Backdrop
+    IconButton
 } from "@mui/material"
+import { keyframes } from '@mui/system'
 import { useTheme as useMuiTheme } from '@mui/material/styles'
 import { IDailyMenu, IFood } from '../../base/utils/Axios/types'
 import { useIntl, FormattedMessage } from "react-intl"
 import { useLocale } from "../../base/Providers/Locales"
 import {
     Warning as WarningIcon,
-    Cached as ChangeIcon
+    Loop as ChangeIcon
 } from '@mui/icons-material'
 import { useDailyMenu } from "../Providers/DailyMenu"
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import ApiClient from '../../base/utils/Axios/ApiClient'
 import { AxiosError } from 'axios'
+import { useFormData } from "../Providers/FormData"
 
+
+const spin = keyframes`
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+`
 
 const RecipeCard: FC<{ mealName: keyof IDailyMenu["foods"], food: IFood }> = ({ mealName, food }) => {
     const theme = useMuiTheme()
     const intl = useIntl()
     const client = useQueryClient()
-    const { isRandomMenu = false, fetchedMenu = { foods: {} }, isFetching, setIsFetching, setIsRandomMenu, setFetchedMenu } = useDailyMenu()
+    const { formData = {} } = useFormData()
+    const { isRandomMenu = false, fetchedMenu = { foods: {} }, setIsRandomMenu, setFetchedMenu } = useDailyMenu()
     const { locale } = useLocale()
     const [onlyCz, setOnlyCz] = useState<boolean>(false)
-    const [showLoadingBackdrop, setShowLoadingBackdrop] = useState<boolean>(false)
-    
+    const [showLoading, setShowLoading] = useState<boolean>(false)
+
     const handleOpenRecipeClick = (url: string) => {
         window.open(url, "_blank", "noopener,noreferrer")
     }
@@ -58,25 +68,7 @@ const RecipeCard: FC<{ mealName: keyof IDailyMenu["foods"], food: IFood }> = ({ 
         status: reloadingMenu
     } = useMutation<IDailyMenu, AxiosError>(
         [`reload_meal_${mealName}`],
-        async () => await ApiClient.reloadMeal(fetchedMenu?.foods as IDailyMenu["foods"], mealName),
-        {
-            retry: 0,
-            cacheTime: 0,
-            onSuccess: (data) => {
-                var newMenu = { ...fetchedMenu as IDailyMenu }
-                newMenu.foods[mealName] = food
-                setFetchedMenu && setFetchedMenu(newMenu)
-                setIsRandomMenu && setIsRandomMenu(false)
-            }
-        }
-    )
-
-    const {
-        mutate: handleRandomReloadMealClick,
-        status: reloadingRandomMenu
-    } = useMutation<IDailyMenu, AxiosError>(
-        [`reload_random_meal_${mealName}`],
-        async () => await ApiClient.reloadRandomMeal(fetchedMenu?.foods as IDailyMenu["foods"], mealName),
+        async () => await ApiClient.reloadMeal(fetchedMenu?.foods as IDailyMenu["foods"], mealName, formData),
         {
             retry: 0,
             cacheTime: 0,
@@ -95,15 +87,15 @@ const RecipeCard: FC<{ mealName: keyof IDailyMenu["foods"], food: IFood }> = ({ 
         if (client.isMutating()) {
             setTimeout(() => {
                 if (client.isMutating()) {
-                    setShowLoadingBackdrop(true)
+                    setShowLoading(true)
                 } else {
-                    setShowLoadingBackdrop(false)
+                    setShowLoading(false)
                 }
             }, 1000)
         } else {
-            setShowLoadingBackdrop(false)
+            setShowLoading(false)
         }
-    }, [reloadingRandomMenu])
+    }, [reloadingMenu])
 
     return (
         <Paper
@@ -122,16 +114,6 @@ const RecipeCard: FC<{ mealName: keyof IDailyMenu["foods"], food: IFood }> = ({ 
                 borderRadius: 5
             }}
         >
-            <Backdrop
-                sx={{
-                    backgroundColor: '#ffffff99',
-                    zIndex: (theme) => theme.zIndex.drawer + 100,
-                    position: "absolute"
-                }}
-                open={showLoadingBackdrop}
-            >
-                <CircularProgress color="primary" />
-            </Backdrop>
             <Grid
                 data-testid={`containers.layout.content.recipe_card.${mealName}`}
                 container
@@ -142,40 +124,38 @@ const RecipeCard: FC<{ mealName: keyof IDailyMenu["foods"], food: IFood }> = ({ 
                     container
                     direction="row"
                 >
-                    <Typography
-                        variant="h6"
-                        color="text.primary"
-                        noWrap
-                        sx={{
-                            mb: 1
-                        }}
-                    >
-                        {mealNames[mealName]}
-                    </Typography>
-                    <Stack
-                        direction="row"
-                        justifyContent="end"
-                    >
-                        {
-                            (isRandomMenu) ?
+                    <Grid item xs={6}>
+                        <Typography
+                            variant="h6"
+                            color="text.primary"
+                            noWrap
+                            sx={{
+                                pt: 0.4
+                            }}
+                        >
+                            {mealNames[mealName]}
+                        </Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <Stack
+                            direction="row"
+                            justifyContent="end"
+                        >
                             <IconButton
                                 data-testid={`containers.layout.content.${mealName}.header.${(isRandomMenu) ? "random_reload_button" : "reload_button"}`}
-                                onClick={
-                                    (isRandomMenu) ?
-                                    () => handleRandomReloadMealClick()
-                                    :
-                                    () => handleReloadMealClick()
-                                }
+                                onClick={() => handleReloadMealClick()}
                                 sx={{
-                                    borderColor: theme.palette.primary.light,
+                                    color: theme.palette.text.primary
                                 }}
                             >
-                                <ChangeIcon />
+                                <ChangeIcon
+                                    sx={{
+                                        animation: (showLoading) ?  `${spin} 1.3s reverse infinite ease` : undefined
+                                    }}
+                                />
                             </IconButton>
-                            :
-                            null
-                        }
-                    </Stack>
+                        </Stack>
+                    </Grid>
                 </Grid>
                 <Typography
                     variant="body2"

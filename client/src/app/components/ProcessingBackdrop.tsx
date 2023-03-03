@@ -19,7 +19,7 @@ const ProcessingBackdrop: FC<{
         <Backdrop
             open={true}
             data-testid="containers.layout.content.processing_backdrop"
-            { ...sx }
+            sx={{ ...sx }}
         >
             <Loading
                 messages={messages}

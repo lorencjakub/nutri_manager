@@ -9,17 +9,17 @@ def generate_menu(**kwargs) -> Union[bool, Tuple[GeneratedMenuData, int]]:
 
 
 def generate_random_menu() -> Union[bool, Tuple[GeneratedMenuData, int]]:
-    menu = Menu().create_menu(True)
+    menu = Menu(random_menu=True).create_menu()
     return menu
 
 
-def generate_random_meal(meal_name: str, meal_ids: List[str]) -> Union[bool, RecipeData]:
-    menu = Menu().create_menu(True, meal_name, meal_ids)
+def generate_meal(meal_name: str, meal_ids: List[str], kwargs) -> Union[bool, RecipeData]:
+    menu = Menu(random_menu=True, **kwargs).create_menu(meal_name, meal_ids)
     return menu
 
 
 def get_recipe(recipe_id: int) -> Union[RecipeData, bool]:
-    recipe = CsNutriRecipes.get_by_id(recipe_id)
+    recipe = CsNutriRecipes.query.get(recipe_id)
 
     if not recipe:
         return False

@@ -22,7 +22,7 @@ import ProcessingBackdrop from '../components/ProcessingBackdrop'
 import { useDailyMenu } from '../Providers/DailyMenu'
 import { FormDataProvider, useFormData } from '../Providers/FormData'
 import Form from '../components/Form'
-import { IFormFields } from '../../base/utils/types'
+import { IFormFields, IFormData } from '../../base/utils/types'
 
 
 const NewMenuButton: FC<{}> = () => {
@@ -36,7 +36,7 @@ const NewMenuButton: FC<{}> = () => {
         status: generatingMenu
     } = useMutation<IDailyMenu, AxiosError>(
         ["query_daily_menu"],
-        async () => await ApiClient.getDailyMenu(formData),
+        async () => await ApiClient.getDailyMenu({ ...formData }),
         {
             retry: 0,
             cacheTime: 0,
@@ -60,7 +60,6 @@ const NewMenuButton: FC<{}> = () => {
             data-testid="pages.daily_menu.info.buttons.generate_new_menu"
             sx={{
                 backgroundColor: theme.palette.text.primary,
-                maxWidth: 160,
                 m: 2
             }}
         >
@@ -76,6 +75,7 @@ const NewMenuButton: FC<{}> = () => {
 }
 
 const RandomMenuButton: FC<{}> = () => {
+    const { setFormData } = useFormData()
     const { setFetchedMenu, setIsFetching, setIsRandomMenu } = useDailyMenu()
     const theme = useMuiTheme()
     const intl = useIntl()
@@ -104,13 +104,13 @@ const RandomMenuButton: FC<{}> = () => {
     return (
         <Button
             onClick={() => {
+                setFormData && setFormData({})
                 setFetchedMenu && setFetchedMenu(null)
                 handleGenerateMenuClick()
             }}
             data-testid="pages.daily_menu.info.buttons.generate_new_random_menu"
             sx={{
                 backgroundColor: theme.palette.text.primary,
-                maxWidth: 160,
                 m: 2
             }}
         >
@@ -126,6 +126,7 @@ const RandomMenuButton: FC<{}> = () => {
 }
 
 const ResetMenuButton: FC<{}> = () => {
+    const { setFormData } = useFormData()
     const { setFetchedMenu } = useDailyMenu()
     const theme = useMuiTheme()
     const intl = useIntl()
@@ -133,12 +134,12 @@ const ResetMenuButton: FC<{}> = () => {
     return (
         <Button
             onClick={() => {
+                setFormData && setFormData({})
                 setFetchedMenu && setFetchedMenu(null)
             }}
             data-testid="pages.daily_menu.info.buttons.generate_new_menu"
             sx={{
                 backgroundColor: theme.palette.text.primary,
-                maxWidth: 160,
                 m: 2
             }}
         >
@@ -153,8 +154,86 @@ const ResetMenuButton: FC<{}> = () => {
     )
 } 
 
+const ResetFormButton: FC<{ defaultData: IFormFields }> = ({ defaultData }) => {
+    const { setFormData } = useFormData()
+    const theme = useMuiTheme()
+    const intl = useIntl()
+
+    var defaultForm: IFormData = {}
+    Object.entries(defaultData).map(([fieldName, fieldData]) => {
+        defaultForm[fieldName as keyof IFormFields] = fieldData.defaultvalue
+    })
+
+    return (
+        <Button
+            onClick={() => {
+                setFormData && setFormData(defaultForm)
+            }}
+            data-testid="pages.daily_menu.info.buttons.reset_form"
+            sx={{
+                backgroundColor: theme.palette.text.primary,
+                m: 2
+            }}
+        >
+            <Typography
+                variant="body2"
+                color="primary.dark"
+                noWrap
+            >
+                {intl.formatMessage({ id: "pages.daily_menu.info.buttons.reset_form", defaultMessage: "Reset Form" })}
+            </Typography>
+        </Button>
+    )
+}
+
 const DailyMenuInfo: FC<{}> =() => {
     const intl = useIntl()
+
+    const optionsAlergens = {
+        "30": intl.formatMessage({ id: "multiselect.options.alergens.gluten_free", defaultMessage: "Gluten Free" }),
+        "31": intl.formatMessage({ id: "multiselect.options.alergens.lactose_free", defaultMessage: "Lactose Free" }),
+        "33": intl.formatMessage({ id: "multiselect.options.alergens.eggs_free", defaultMessage: "Eggs Free" }),
+        "34": intl.formatMessage({ id: "multiselect.options.alergens.nuts_free", defaultMessage: "Nuts Free" })
+    }
+    
+    const optionsPreference = {
+        "2": intl.formatMessage({ id: "multiselect.options.preference.no_sugar", defaultMessage: "No sugar" }),
+        "3": intl.formatMessage({ id: "multiselect.options.preference.hight_proteins", defaultMessage: "High Proteins" }),
+        "4": intl.formatMessage({ id: "multiselect.options.preference.high_fiber", defaultMessage: "High Fiber" }),
+        "5": intl.formatMessage({ id: "multiselect.options.preference.low_carbs", defaultMessage: "Low Carbs" }),
+        "6": intl.formatMessage({ id: "multiselect.options.preference.low_energy", defaultMessage: "Low Energy" }),
+        "7": intl.formatMessage({ id: "multiselect.options.preference.low_fats", defaultMessage: "Low Fats" }),
+        "9": intl.formatMessage({ id: "multiselect.options.preference.vegetarian", defaultMessage: "Vegetarian" }),
+        "10": intl.formatMessage({ id: "multiselect.options.preference.vegan", defaultMessage: "Vegan" }),
+        "12": intl.formatMessage({ id: "multiselect.options.preference.protein_powder", defaultMessage: "Protein Powder" })
+    }
+    
+    const optionsIngredients = {
+        "39": intl.formatMessage({ id: "multiselect.options.ingredient.zucchini", defaultMessage: "Zucchini" }),
+        "40": intl.formatMessage({ id: "multiselect.options.ingredient.chicken", defaultMessage: "Chicken" }),
+        "41": intl.formatMessage({ id: "multiselect.options.ingredient.beef", defaultMessage: "Beef" }),
+        "42": intl.formatMessage({ id: "multiselect.options.ingredient.tuna", defaultMessage: "Tuna" }),
+        "43": intl.formatMessage({ id: "multiselect.options.ingredient.avocado", defaultMessage: "Avocado" }),
+        "44": intl.formatMessage({ id: "multiselect.options.ingredient.peanuts_butter", defaultMessage: "Peanuts Butter" }),
+        "45": intl.formatMessage({ id: "multiselect.options.ingredient.chia_seeds", defaultMessage: "Chia Seeds" }),
+        "46": intl.formatMessage({ id: "multiselect.options.ingredient.coconut", defaultMessage: "Coconut" }),
+        "47": intl.formatMessage({ id: "multiselect.options.ingredient.oat_flakes", defaultMessage: "Oat Flakes" }),
+        "48": intl.formatMessage({ id: "multiselect.options.ingredient.sweet_potatoes", defaultMessage: "Sweet Potatoes" }),
+        "49": intl.formatMessage({ id: "multiselect.options.ingredient.pumpkin", defaultMessage: "Pumpkin" }),
+        "50": intl.formatMessage({ id: "multiselect.options.ingredient.rice", defaultMessage: "Rice" }),
+        "51": intl.formatMessage({ id: "multiselect.options.ingredient.quinoa", defaultMessage: "Quinoa" }),
+        "52": intl.formatMessage({ id: "multiselect.options.ingredient.salmon", defaultMessage: "Salmon" }),
+        "53": intl.formatMessage({ id: "multiselect.options.ingredient.tofu", defaultMessage: "Tofu" }),
+        "54": intl.formatMessage({ id: "multiselect.options.ingredient.couscous", defaultMessage: "Couscous" }),
+        "55": intl.formatMessage({ id: "multiselect.options.ingredient.eggs", defaultMessage: "Eggs" }),
+        "56": intl.formatMessage({ id: "multiselect.options.ingredient.vegetable", defaultMessage: "Vegatable" })
+    }
+    
+    const options = {
+        [intl.formatMessage({ id: "multiselect.options.subheaders.alergens", defaultMessage: "Alergens" })]: { ...optionsAlergens },
+        [intl.formatMessage({ id: "multiselect.options.subheaders.preference", defaultMessage: "Preference" })]: { ...optionsPreference },
+        [intl.formatMessage({ id: "multiselect.options.subheaders.ingredients", defaultMessage: "Ingredients" })]: { ...optionsIngredients }
+    }
 
     const fields: IFormFields = {
         energy: {
@@ -187,18 +266,37 @@ const DailyMenuInfo: FC<{}> =() => {
             type: "checkbox",
             defaultvalue: true
         },
-        // tags: {
-        //     label: intl.formatMessage({ id: "page.form.energy.tags", defaultMessage: "Tags and categories" }),
-        //     type: "multiselect",
-        //     defaultvalue: []
-        // },
-        // iterations: {
-        //     label: intl.formatMessage({ id: "page.form.iterations", defaultMessage: "Max. count of iterations" }),
-        //     type: "slider",
-        //     defaultvalue: 300,
-        //     min: 100,
-        //     max: 500
-        // },
+        breakfast_tags: {
+            label: intl.formatMessage({ id: "page.form.energy.tags.breakfast", defaultMessage: "Breakfast Tags" }),
+            type: "multiselect",
+            defaultvalue: [],
+            selectvalues: options
+        },
+        lunch_tags: {
+            label: intl.formatMessage({ id: "page.form.energy.tags.lunch", defaultMessage: "Lunch Tags" }),
+            type: "multiselect",
+            defaultvalue: [],
+            selectvalues: options
+        },
+        snack_tags: {
+            label: intl.formatMessage({ id: "page.form.energy.tags.snack", defaultMessage: "Snack Tags" }),
+            type: "multiselect",
+            defaultvalue: [],
+            selectvalues: options
+        },
+        dinner_tags: {
+            label: intl.formatMessage({ id: "page.form.energy.tags.dinner", defaultMessage: "Dinner Tags" }),
+            type: "multiselect",
+            defaultvalue: [],
+            selectvalues: options
+        },
+        iterations: {
+            label: intl.formatMessage({ id: "page.form.iterations", defaultMessage: "Max. count of iterations" }),
+            type: "slider",
+            defaultvalue: 300,
+            min: 100,
+            max: 500
+        }
     }
 
     return (
@@ -321,16 +419,15 @@ const DailyMenuInfo: FC<{}> =() => {
                         backgroundColor: "background.default"
                     }}
                 >
-                    <FormDataProvider>
-                        <Form fields={fields} />
-                        <Stack
-                            direction="row"
-                            justifyContent="center"
-                        >
-                            <NewMenuButton />
-                            <RandomMenuButton />    
-                        </Stack>
-                    </FormDataProvider>
+                    <Form fields={fields} />
+                    <Stack
+                        direction="row"
+                        justifyContent="center"
+                    >
+                        <ResetFormButton defaultData={fields} />
+                        <NewMenuButton />
+                        <RandomMenuButton />    
+                    </Stack>
                 </Grid>
             </Grid>
         </React.Fragment>
@@ -374,7 +471,7 @@ const DailyMenuData: FC<{}> =() => {
                 {fetchedMenu?.foods && Object.entries(fetchedMenu?.foods).map(([mealName, food]: [string, IFood]) => {
                     if (food) return (
                         <RecipeCard
-                            mealName={mealName}
+                            mealName={mealName as keyof IDailyMenu["foods"]}
                             food={food}
                             key={mealName}
                         />
@@ -451,7 +548,8 @@ const DailyMenuPage: FC<{}> = () => {
         intl.formatMessage({ id: "containers.layout.content.processing_backdrop.messages.taters", defaultMessage: "What's taters, precious? What's taters, eh?" }),
         intl.formatMessage({ id: "containers.layout.content.processing_backdrop.messages.lembas", defaultMessage: "Lembas bread. One small bite will fill the stomach of a grown man." }),
         intl.formatMessage({ id: "containers.layout.content.processing_backdrop.messages.pea_soup", defaultMessage: "If you have pea soup, make sure you eat it before it eats you." }),
-        intl.formatMessage({ id: "containers.layout.content.processing_backdrop.messages.white_wolf", defaultMessage: "White wolf, did you eat Red Riding Hood?" })
+        intl.formatMessage({ id: "containers.layout.content.processing_backdrop.messages.white_wolf", defaultMessage: "White wolf, did you eat Red Riding Hood?" }),
+        intl.formatMessage({ id: "containers.layout.content.processing_backdrop.messages.ketchup", defaultMessage: "You want ketchup?? With lobster? You want brown ketchup?!" })
     ]
 
     const shuffleMessages = (messages: string[]): string[] => {
@@ -488,11 +586,18 @@ const DailyMenuPage: FC<{}> = () => {
                     backgroundColor: "background.default"
                 }}
             >
-                {(!fetchedMenu) ? <DailyMenuInfo /> : <DailyMenuData />}
+                <FormDataProvider>
+                    {(!fetchedMenu) ? <DailyMenuInfo /> : <DailyMenuData />}
+                </FormDataProvider>
             </Grid>
             {(!isFetching) ? null :
                 <ProcessingBackdrop
                     messages={shuffleMessages(processingMessages)}
+                    sx={{
+                        backgroundColor: "background.default",
+                        opacity: 0,
+                        zIndex: 5
+                    }}
                 />
             }
         </Paper>

@@ -5,9 +5,10 @@ import { messagesGetter } from "../../base/Providers/Locales/Provider"
 import LocaleComponent from "../LocaleTestComponent"
 import {
     mockedDailyMenuSuccessOnlyCs,
-    mockedDailyMenuSuccessMultiLang
+    mockedDailyMenuSuccessMultiLang,
 } from "../MockedApiValues"
-import { IFood } from "../../base/utils/Axios/types"
+import { IFood, IDailyMenu } from "../../base/utils/Axios/types"
+import ApiClient from "../../base/utils/Axios/ApiClient"
 
 
 beforeEach(() => {
@@ -17,7 +18,7 @@ beforeEach(() => {
     sessionStorage.clear()
 })
 
-async function renderTest(mealName: string, data: IFood, locale: string = "cs") {
+async function renderTest(mealName: keyof IDailyMenu["foods"], data: IFood, locale: string = "cs") {
     localStorage.setItem("locale", locale)
 
     await act(async () => {
@@ -84,5 +85,20 @@ describe("Test of Recipe card rendering", () => {
         expect(screen.getByTestId("containers.layout.content.recipe_source_button")).toBeInTheDocument()
         expect(screen.queryByTestId("WarningIcon")).not.toBeInTheDocument()
         expect(screen.queryByText(messages["containers.layout.content.recipe_card.only_cz"])).not.toBeInTheDocument()
+    })
+})
+
+describe("Test of Recipe card functionalities", () => {
+    test("Reload meal", async () => {
+        jest.spyOn(ApiClient, "reloadMeal")
+
+        const menu = { ...mockedDailyMenuSuccessOnlyCs }
+        await renderTest("breakfast", menu.foods.breakfast, "cs")
+
+        const reloadButton = screen.getByTestId("containers.layout.content.breakfast.header.reload_button")
+        expect(reloadButton).toBeInTheDocument()
+    
+        await waitFor(() => fireEvent.click(reloadButton))
+        expect(ApiClient.reloadMeal).toBeCalled()
     })
 })

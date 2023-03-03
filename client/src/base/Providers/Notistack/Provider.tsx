@@ -1,4 +1,4 @@
-import { FC, ReactNode } from "react"
+import React, { FC, ReactNode } from "react"
 import { SnackbarProvider, useSnackbar, SnackbarKey } from "notistack"
 import { IconButton } from "@mui/material"
 import { Close as IconClose } from "@mui/icons-material"

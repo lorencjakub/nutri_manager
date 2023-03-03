@@ -8,13 +8,12 @@ from api.routes import *
 
 import os
 import sys
-import re
 import json
 from distinct_types import Union
 
 
 BE_ENV = os.environ.get("BE_ENV")
-print(BE_ENV)
+
 
 def create_app(with_secutiry: bool = True) -> Flask:
     """Create application factory
@@ -33,10 +32,11 @@ def create_app(with_secutiry: bool = True) -> Flask:
             try:
                 fe_origin = json.loads(fe_origin)
                 
-            except:
+            except json.decoder.JSONDecodeError:
                 pass
 
             cors_settings["origins"] = [*fe_origin] if isinstance(fe_origin, list) else [fe_origin]
+
         CORS(app, **cors_settings)
         SecurityHeaderManager(app, **security_headers)
 
@@ -46,6 +46,8 @@ def create_app(with_secutiry: bool = True) -> Flask:
     # register_shellcontext(app)
     # register_commands(app)
     # configure_logger(app)
+
+    app.config['CORS_HEADERS'] = 'Content-Type'
 
     return app
 
@@ -142,7 +144,7 @@ def main_loop() -> Union[None, Flask]:
         return app
     
     else:
-        app.run(debug=(BE_ENV != "prod"), host=host, port=port)
+        app.run(debug=True, host=host, port=port)
 
 
 if __name__ == "__main__":

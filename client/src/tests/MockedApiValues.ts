@@ -72,3 +72,17 @@ mockedDailyMenuSuccessMultiLangWithoutSnack.foods.dinner.de_name = "Test Abendes
 mockedDailyMenuSuccessMultiLangWithoutSnack.foods.dinner.de_url = "Abendessen URL en"
 
 export const mockedDailyMenuSuccessMultiLang = mockedDailyMenuSuccessMultiLangWithoutSnack
+
+export const defaultMenuData = {
+    energy: 2000,
+    carbs: 40,
+    proteins: 40,
+    fats: 20,
+    breakfast_tags: [],
+    lunch_tags: [],
+    snack_tags: [],
+    dinner_tags: [],
+    minimum_energy_check: false,
+    with_snack: true,
+    iterations: 300
+}

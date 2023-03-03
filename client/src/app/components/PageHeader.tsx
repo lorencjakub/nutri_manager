@@ -8,7 +8,6 @@ import {
 import { useThemeMode } from "../../base/Providers/ThemeMode"
 import { useTheme as useMuiTheme } from "@mui/material/styles"
 import { useNavigate } from "react-router-dom"
-import Logo from "../../static/food-dinner-icon.svg"
 
 
 const PageHeader: FC<{ pageTitle: string, appBarContent?: ReactNode }> = ({ pageTitle, appBarContent }) => {

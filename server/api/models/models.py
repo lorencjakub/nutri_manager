@@ -5,13 +5,11 @@ import os
 
 BE_ENV = os.environ.get("BE_ENV", default="dev")
 DRIVERNAME = __import__("config_%s" % (BE_ENV,)).DB_DRIVERNAME
+module = __import__("sqlalchemy.dialects.%s" % (DRIVERNAME,)).dialects
+module = getattr(module, DRIVERNAME)
 
 
 class CsNutriRecipes(PkModel):
-    module = __import__("sqlalchemy.dialects.%s" % (DRIVERNAME,)).dialects
-    module = getattr(module, DRIVERNAME)
-    JSON = module.ARRAY(db.Integer) if DRIVERNAME == "postgresql" else module.JSON
-
     __tablename__ = "cs_nutri_recipes"
     __table_args__ = {'extend_existing': True}
 
@@ -22,7 +20,7 @@ class CsNutriRecipes(PkModel):
     carbs = db.Column(db.Text, nullable=False)
     fats = db.Column(db.Text, nullable=False)
     fiber = db.Column(db.Text, nullable=False)
-    tags = db.Column(JSON)
+    tags = db.Column(module.JSON, default=[])
     url = db.Column(db.Text, nullable=False)
     recipe_id = db.Column(db.Integer, nullable=False)
     portions = db.Column(db.Integer, nullable=False)
@@ -38,10 +36,6 @@ class CsNutriRecipes(PkModel):
 
 
 class EnNutriRecipes(PkModel):
-    module = __import__("sqlalchemy.dialects.%s" % (DRIVERNAME,)).dialects
-    module = getattr(module, DRIVERNAME)
-    JSON = module.ARRAY(db.Integer) if DRIVERNAME == "postgresql" else module.JSON
-
     __tablename__ = "en_nutri_recipes"
     __table_args__ = {'extend_existing': True}
 
@@ -52,7 +46,7 @@ class EnNutriRecipes(PkModel):
     carbs = db.Column(db.Text, nullable=False)
     fats = db.Column(db.Text, nullable=False)
     fiber = db.Column(db.Text, nullable=False)
-    tags = db.Column(JSON)
+    tags = db.Column(module.JSON, default=[])
     url = db.Column(db.Text, nullable=False)
     recipe_id = db.Column(db.Integer, nullable=False)
     portions = db.Column(db.Integer, nullable=False)
@@ -68,10 +62,6 @@ class EnNutriRecipes(PkModel):
 
 
 class DeNutriRecipes(PkModel):
-    module = __import__("sqlalchemy.dialects.%s" % (DRIVERNAME,)).dialects
-    module = getattr(module, DRIVERNAME)
-    JSON = module.ARRAY(db.Integer) if DRIVERNAME == "postgresql" else module.JSON
-
     __tablename__ = "de_nutri_recipes"
     __table_args__ = {'extend_existing': True}
 
@@ -82,7 +72,7 @@ class DeNutriRecipes(PkModel):
     carbs = db.Column(db.Text, nullable=False)
     fats = db.Column(db.Text, nullable=False)
     fiber = db.Column(db.Text, nullable=False)
-    tags = db.Column(JSON)
+    tags = db.Column(module.JSON, default=[])
     url = db.Column(db.Text, nullable=False)
     recipe_id = db.Column(db.Integer, nullable=False)
     portions = db.Column(db.Integer, nullable=False)
