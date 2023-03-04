@@ -25,6 +25,8 @@ import Form from '../components/Form'
 import { IFormFields, IFormData } from '../../base/utils/types'
 
 
+export var DEFAULT_FORM: IFormData = {}
+
 const NewMenuButton: FC<{}> = () => {
     const { formData = {} } = useFormData()
     const { setFetchedMenu, setIsFetching, setIsRandomMenu } = useDailyMenu()
@@ -74,7 +76,7 @@ const NewMenuButton: FC<{}> = () => {
     )
 }
 
-const RandomMenuButton: FC<{}> = () => {
+const RandomMenuButton: FC<{ defaultForm: IFormData }> = ({ defaultForm }) => {
     const { setFormData } = useFormData()
     const { setFetchedMenu, setIsFetching, setIsRandomMenu } = useDailyMenu()
     const theme = useMuiTheme()
@@ -93,6 +95,7 @@ const RandomMenuButton: FC<{}> = () => {
             onSuccess: (data) => {
                 setFetchedMenu && setFetchedMenu(data)
                 setIsRandomMenu && setIsRandomMenu(true)
+                setFormData && setFormData(defaultForm)
             }
         }
     )
@@ -154,15 +157,10 @@ const ResetMenuButton: FC<{}> = () => {
     )
 } 
 
-const ResetFormButton: FC<{ defaultData: IFormFields }> = ({ defaultData }) => {
+const ResetFormButton: FC<{ defaultForm: IFormData }> = ({ defaultForm }) => {
     const { setFormData } = useFormData()
     const theme = useMuiTheme()
     const intl = useIntl()
-
-    var defaultForm: IFormData = {}
-    Object.entries(defaultData).map(([fieldName, fieldData]) => {
-        defaultForm[fieldName as keyof IFormFields] = fieldData.defaultvalue
-    })
 
     return (
         <Button
@@ -299,6 +297,10 @@ const DailyMenuInfo: FC<{}> =() => {
         }
     }
 
+    Object.entries(fields).map(([fieldName, fieldData]) => {
+        DEFAULT_FORM[fieldName as keyof IFormFields] = fieldData.defaultvalue
+    })
+
     return (
         <React.Fragment>
             <Grid
@@ -424,9 +426,9 @@ const DailyMenuInfo: FC<{}> =() => {
                         direction="row"
                         justifyContent="center"
                     >
-                        <ResetFormButton defaultData={fields} />
+                        <ResetFormButton defaultForm={DEFAULT_FORM} />
                         <NewMenuButton />
-                        <RandomMenuButton />    
+                        <RandomMenuButton defaultForm={DEFAULT_FORM} />    
                     </Stack>
                 </Grid>
             </Grid>
@@ -525,7 +527,7 @@ const DailyMenuData: FC<{}> =() => {
                     justifyContent="center"
                 >
                     <ResetMenuButton />
-                    <RandomMenuButton />    
+                    <RandomMenuButton defaultForm={DEFAULT_FORM} />    
                 </Stack>
             </Grid>
         </React.Fragment>
