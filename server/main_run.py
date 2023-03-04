@@ -8,7 +8,6 @@ from api.routes import *
 
 import os
 import sys
-import re
 import json
 from distinct_types import Union
 
@@ -33,10 +32,11 @@ def create_app(with_secutiry: bool = True) -> Flask:
             try:
                 fe_origin = json.loads(fe_origin)
                 
-            except:
+            except json.decoder.JSONDecodeError:
                 pass
 
             cors_settings["origins"] = [*fe_origin] if isinstance(fe_origin, list) else [fe_origin]
+
         CORS(app, **cors_settings)
         SecurityHeaderManager(app, **security_headers)
 
@@ -46,6 +46,8 @@ def create_app(with_secutiry: bool = True) -> Flask:
     # register_shellcontext(app)
     # register_commands(app)
     # configure_logger(app)
+
+    app.config['CORS_HEADERS'] = 'Content-Type'
 
     return app
 
@@ -98,8 +100,7 @@ def main_loop() -> Union[None, Flask]:
     app = create_app()
 
     with app.app_context():
-        empty_db = (len(inspect(db.engine).get_table_names()) == 0) if BE_ENV == "prod" else \
-            "database.sqlite3" not in os.listdir(os.getcwd())
+        empty_db = (len(inspect(db.engine).get_table_names()) == 0) if BE_ENV != "test" else False
 
         if empty_db:
             print('No DB found. Creating...')
@@ -111,24 +112,12 @@ def main_loop() -> Union[None, Flask]:
             os.system("flask db init")
             print('A new database has been created.')
 
-        if "migrations" not in os.listdir(os.getcwd()):
-            if "-m" in sys.argv:
-                index_of_message_flag = sys.argv.index("-m")
-                message = sys.argv[index_of_message_flag + 1]
-                os.system(f'flask db init && flask db migrate -m "{message}"')
-
-            else:
-                os.system("flask db init && flask db migrate")
-
-        elif "-m" in sys.argv:
+        if "-m" in sys.argv:
             index_of_message_flag = sys.argv.index("-m")
             message = sys.argv[index_of_message_flag + 1]
             os.system(f'flask db migrate -m "{message}"')
 
-        if "versions" in os.listdir(f'{os.getcwd()}/migrations') and [
-            re.findall("py$", v) for v in os.listdir(f'{os.getcwd()}/migrations/versions')
-        ]:
-            os.system("flask db upgrade")
+        os.system("flask db upgrade")
 
         if BE_ENV != "test":
             db_row_counts = {
@@ -155,7 +144,7 @@ def main_loop() -> Union[None, Flask]:
         return app
     
     else:
-        app.run(debug=(BE_ENV != "prod"), host=host, port=port)
+        app.run(debug=True, host=host, port=port)
 
 
 if __name__ == "__main__":

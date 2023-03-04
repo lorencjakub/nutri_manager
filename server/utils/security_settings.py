@@ -7,8 +7,8 @@ BE_ENV = os.environ.get("BE_ENV")
 def set_cors() -> CORSSettings:
     cors_settings = {
         "origins": ["*"],
-        "methods": ["GET", "OPTIONS", "HEAD"],
-        "allow_headers": "CorsTrigger"
+        "methods": ["GET", "POST", "OPTIONS", "HEAD"],
+        "allow_headers": ["CorsTrigger", "Content-Type"]
     }
 
     return cors_settings

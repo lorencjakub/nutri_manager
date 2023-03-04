@@ -1,4 +1,4 @@
-import React from "react"
+import React, { createContext } from "react"
 
 
 interface ILocaleContext {
@@ -9,6 +9,6 @@ interface ILocaleContext {
     allLocales: string[]
 }
 
-const ThemeContext = React.createContext<Partial<ILocaleContext>>({})
+const ThemeContext = createContext<Partial<ILocaleContext>>({})
 
 export default ThemeContext

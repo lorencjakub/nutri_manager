@@ -1,3 +1,4 @@
+import React from "react"
 import { render, screen, act } from "../testSetup"
 import App from "../../base/containers/App"
 import PageFooter from "../../app/components/PageFooter"

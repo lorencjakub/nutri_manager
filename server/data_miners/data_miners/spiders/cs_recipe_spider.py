@@ -46,8 +46,7 @@ class CsNutriRecipeSpider(scrapy.Spider):
 
                 recipe_hrefs = {
                     "name": el["title"],
-                    "tags": json.dumps(el['tags']) if (isinstance(el['tags'], list) or isinstance(el['tags'], list))
-                    else str(el['tags']),
+                    "tags": el['tags'] if (isinstance(el['tags'], list)) else [],
                     "url": f'{self.recipe_base_url}{el["slug"]}',
                     'recipe_id': int(el['id']),
                     'portions': int(el['portionCount'])

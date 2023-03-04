@@ -1,3 +1,4 @@
+import React from "react"
 import { render, screen, act, fireEvent } from "../testSetup"
 import App from "../../base/containers/App"
 import flagUrls from "../../app/config/locales/flagUrls.json"

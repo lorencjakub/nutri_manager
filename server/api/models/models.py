@@ -1,10 +1,18 @@
 """Database module, including the SQLAlchemy database object and DB-related utilities."""
 from database import db, PkModel
+import os
+
+
+BE_ENV = os.environ.get("BE_ENV", default="dev")
+DRIVERNAME = __import__("config_%s" % (BE_ENV,)).DB_DRIVERNAME
+module = __import__("sqlalchemy.dialects.%s" % (DRIVERNAME,)).dialects
+module = getattr(module, DRIVERNAME)
 
 
 class CsNutriRecipes(PkModel):
     __tablename__ = "cs_nutri_recipes"
     __table_args__ = {'extend_existing': True}
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
     energy = db.Column(db.Text, nullable=False)
@@ -12,7 +20,7 @@ class CsNutriRecipes(PkModel):
     carbs = db.Column(db.Text, nullable=False)
     fats = db.Column(db.Text, nullable=False)
     fiber = db.Column(db.Text, nullable=False)
-    tags = db.Column(db.Text, nullable=False)
+    tags = db.Column(module.JSON, default=[])
     url = db.Column(db.Text, nullable=False)
     recipe_id = db.Column(db.Integer, nullable=False)
     portions = db.Column(db.Integer, nullable=False)
@@ -30,6 +38,7 @@ class CsNutriRecipes(PkModel):
 class EnNutriRecipes(PkModel):
     __tablename__ = "en_nutri_recipes"
     __table_args__ = {'extend_existing': True}
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
     energy = db.Column(db.Text, nullable=False)
@@ -37,7 +46,7 @@ class EnNutriRecipes(PkModel):
     carbs = db.Column(db.Text, nullable=False)
     fats = db.Column(db.Text, nullable=False)
     fiber = db.Column(db.Text, nullable=False)
-    tags = db.Column(db.Text, nullable=False)
+    tags = db.Column(module.JSON, default=[])
     url = db.Column(db.Text, nullable=False)
     recipe_id = db.Column(db.Integer, nullable=False)
     portions = db.Column(db.Integer, nullable=False)
@@ -55,6 +64,7 @@ class EnNutriRecipes(PkModel):
 class DeNutriRecipes(PkModel):
     __tablename__ = "de_nutri_recipes"
     __table_args__ = {'extend_existing': True}
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
     energy = db.Column(db.Text, nullable=False)
@@ -62,7 +72,7 @@ class DeNutriRecipes(PkModel):
     carbs = db.Column(db.Text, nullable=False)
     fats = db.Column(db.Text, nullable=False)
     fiber = db.Column(db.Text, nullable=False)
-    tags = db.Column(db.Text, nullable=False)
+    tags = db.Column(module.JSON, default=[])
     url = db.Column(db.Text, nullable=False)
     recipe_id = db.Column(db.Integer, nullable=False)
     portions = db.Column(db.Integer, nullable=False)

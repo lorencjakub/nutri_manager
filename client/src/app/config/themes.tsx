@@ -36,6 +36,19 @@ const darkTheme: Theme = createTheme({
                     backgroundColor: theme.palette.text.disabled
                 })
             }
+        },
+        MuiSlider: {
+            styleOverrides: {
+                thumb:{
+                    color: "#5f2805",
+                },
+                track: {
+                    color: "#ff5733"
+                },
+                rail: {
+                    color: "#fff"
+                }
+            }
         }
     }
 })

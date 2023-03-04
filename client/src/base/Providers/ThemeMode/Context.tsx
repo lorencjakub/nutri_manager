@@ -1,4 +1,4 @@
-import React from "react"
+import React, { createContext } from "react"
 
 
 interface IThemeContext {
@@ -6,6 +6,6 @@ interface IThemeContext {
     toggleThemeMode?: () => void
 }
 
-const ThemeContext = React.createContext<Partial<IThemeContext>>({})
+const ThemeContext = createContext<Partial<IThemeContext>>({})
 
 export default ThemeContext

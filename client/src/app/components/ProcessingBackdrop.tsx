@@ -7,8 +7,9 @@ import { useIntl } from "react-intl"
 const ProcessingBackdrop: FC<{
     messages?: string[],
     loadingDefaultMessage?: string,
-    spinner?: JSX.Element
-}> = ({ messages = [], spinner, loadingDefaultMessage }) => {
+    spinner?: JSX.Element,
+    sx?: any
+}> = ({ messages = [], spinner, loadingDefaultMessage, sx = {} }) => {
     const intl = useIntl()
 
     const nothingToSay = intl.formatMessage({ id: "containers.layout.content.processing_backdrop.messages.thinking", defaultMessage: "Thinking about what to do..." })
@@ -18,6 +19,7 @@ const ProcessingBackdrop: FC<{
         <Backdrop
             open={true}
             data-testid="containers.layout.content.processing_backdrop"
+            sx={{ ...sx }}
         >
             <Loading
                 messages={messages}
